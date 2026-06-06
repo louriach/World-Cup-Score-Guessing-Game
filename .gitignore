@@ -1,0 +1,45 @@
+# Environment & secrets — never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+
+# Supabase local config (contains local DB credentials)
+supabase/.temp/
+supabase/config.toml.local
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.iml
+.packages
+pubspec.lock
+
+# Xcode / iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+GoogleService-Info.plist
+google-services.json
+
+# Android
+android/.gradle/
+android/local.properties
+android/key.properties          # signing keys — never commit
+*.jks
+*.keystore
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+*.swp
