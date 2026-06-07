@@ -82,13 +82,24 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
               const SizedBox(height: AppSpacing.sm),
               _Field(
                 controller: _phraseCtrl,
-                placeholder: 'e.g. golden-tiger-bends-spoon',
-                onChanged: (_) => setState(() {}),
+                placeholder: 'e.g. golden tiger bends spoon',
+                onChanged: (val) {
+                  // Auto-replace spaces with hyphens as the user types
+                  final hyphenated = val.replaceAll(' ', '-');
+                  if (hyphenated != val) {
+                    _phraseCtrl.value = TextEditingValue(
+                      text: hyphenated,
+                      selection: TextSelection.collapsed(
+                          offset: hyphenated.length),
+                    );
+                  }
+                  setState(() {});
+                },
                 maxLength: 40,
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Use hyphens or spaces between words. Min 2 words.',
+                'Min 2 words.',
                 style: AppTextStyles.caption,
               ),
               const SizedBox(height: AppSpacing.huge),
