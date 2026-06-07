@@ -31080,7 +31080,7 @@ var $async$aLD=A.o(function(a,b){if(a===1)return A.p(b,r)
 for(;;)switch(s){case 0:if($.T==null)A.awC()
 $.T.toString
 s=2
-return A.n(A.auf("sb_publishable_nmuGWO3sHRVMK9Z1rXSV-w_0DuD03JZ","https://abmzwhjuisawlywmzapd.supabase.co"),$async$aLD)
+return A.n(A.auf("sb_publishable_nmuGWO3sHRVMK9Z1rXSV-w_0DuD03JZ","https://abmzwhjuisawlywmzapd.supabase.c"),$async$aLD)
 case 2:if($.T==null)A.awC()
 q=$.T
 q.toString
