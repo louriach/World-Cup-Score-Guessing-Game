@@ -1,11 +1,11 @@
 {
-    "name": "golden_goals",
-    "short_name": "golden_goals",
+    "name": "Golden Goals",
+    "short_name": "Golden Goals",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "description": "Predict every World Cup 2026 score. Beat your mates.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
