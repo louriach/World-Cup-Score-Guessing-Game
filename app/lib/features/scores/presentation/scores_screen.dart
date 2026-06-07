@@ -213,11 +213,7 @@ class _FixtureCard extends StatelessWidget {
                 if (isLocked)
                   Text('Locked',
                       style: AppTextStyles.caption
-                          .copyWith(color: AppColors.error))
-                else if (hasGuess)
-                  Text('Guessed ✓',
-                      style: AppTextStyles.caption
-                          .copyWith(color: AppColors.success)),
+                          .copyWith(color: AppColors.error)),
               ],
             ),
             const SizedBox(height: AppSpacing.md),

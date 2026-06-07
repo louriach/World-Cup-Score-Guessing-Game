@@ -64,23 +64,23 @@ GoRouter router(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/sign-in', builder: (_, __) => const SignInScreen()),
-      GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
+      GoRoute(path: '/sign-in', pageBuilder: (_, __) => _fadePage(const SignInScreen())),
+      GoRoute(path: '/onboarding', pageBuilder: (_, __) => _fadePage(const OnboardingScreen())),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),
         branches: [
           StatefulShellBranch(routes: [
-            GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
+            GoRoute(path: '/home', pageBuilder: (_, __) => _fadePage(const HomeScreen())),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/scores',
-              builder: (_, __) => const ScoresScreen(),
+              pageBuilder: (_, __) => _fadePage(const ScoresScreen()),
               routes: [
                 GoRoute(
                   path: ':fixtureId',
-                  builder: (_, state) =>
-                      FixtureDetailScreen(fixtureId: state.pathParameters['fixtureId']!),
+                  pageBuilder: (_, state) =>
+                      _fadePage(FixtureDetailScreen(fixtureId: state.pathParameters['fixtureId']!)),
                 ),
               ],
             ),
@@ -88,14 +88,14 @@ GoRouter router(Ref ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/leagues',
-              builder: (_, __) => const LeaguesScreen(),
+              pageBuilder: (_, __) => _fadePage(const LeaguesScreen()),
               routes: [
-                GoRoute(path: 'create', builder: (_, __) => const CreateLeagueScreen()),
-                GoRoute(path: 'join', builder: (_, __) => const JoinLeagueScreen()),
+                GoRoute(path: 'create', pageBuilder: (_, __) => _fadePage(const CreateLeagueScreen())),
+                GoRoute(path: 'join', pageBuilder: (_, __) => _fadePage(const JoinLeagueScreen())),
                 GoRoute(
                   path: ':leagueId',
-                  builder: (_, state) =>
-                      LeagueDetailScreen(leagueId: state.pathParameters['leagueId']!),
+                  pageBuilder: (_, state) =>
+                      _fadePage(LeagueDetailScreen(leagueId: state.pathParameters['leagueId']!)),
                 ),
               ],
             ),
@@ -103,12 +103,12 @@ GoRouter router(Ref ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/me',
-              builder: (_, state) => const ProfileScreen(),
+              pageBuilder: (_, __) => _fadePage(const ProfileScreen()),
               routes: [
                 GoRoute(
                   path: ':userId',
-                  builder: (_, state) =>
-                      ProfileScreen(userId: state.pathParameters['userId']),
+                  pageBuilder: (_, state) =>
+                      _fadePage(ProfileScreen(userId: state.pathParameters['userId'])),
                 ),
               ],
             ),
@@ -116,5 +116,15 @@ GoRouter router(Ref ref) {
         ],
       ),
     ],
+  );
+}
+
+/// Instant page transition — no slide, no fade delay. Feels like a web page.
+CustomTransitionPage<void> _fadePage(Widget child) {
+  return CustomTransitionPage<void>(
+    child: child,
+    transitionDuration: Duration.zero,
+    reverseTransitionDuration: Duration.zero,
+    transitionsBuilder: (_, __, ___, child) => child,
   );
 }

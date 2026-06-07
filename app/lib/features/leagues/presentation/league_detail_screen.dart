@@ -179,8 +179,8 @@ class _CopyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text('$label: ', style: AppTextStyles.caption),
-        Expanded(child: Text(value, style: AppTextStyles.body)),
+        Text('$label: ', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
+        Expanded(child: Text(value, style: AppTextStyles.bodyLargeBold)),
         CupertinoButton(
           padding: EdgeInsets.zero,
           minSize: 0,

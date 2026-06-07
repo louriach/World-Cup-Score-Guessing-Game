@@ -25,6 +25,7 @@ dependencies:
   # Images
   cached_network_image: ^3.3.1
   image_picker: ^1.1.0
+  flutter_svg: ^2.0.10
 
   # Push notifications (handles APNs on iOS, FCM on Android)
   firebase_core: ^3.1.0

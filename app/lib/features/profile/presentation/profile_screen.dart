@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/models/fixture.dart';
 import '../../../shared/models/guess.dart';
 import '../../auth/providers/auth_providers.dart';
@@ -52,9 +53,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         trailing: _isOwnProfile
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: const Icon(CupertinoIcons.pencil,
-                    color: AppColors.primary, size: 20),
                 onPressed: () => _showEditSheet(context, profileAsync.valueOrNull),
+                child: AppIcon.pencil(size: 18, color: AppColors.primary),
               )
             : null,
       ),

@@ -55,7 +55,13 @@ class _PwaInstallBannerState extends State<PwaInstallBanner> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.asset('assets/images/app_icon.png'),
+                    // Use the web icon which has a black background
+                    child: Image.network(
+                      'icons/Icon-192.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Image.asset('assets/images/app_icon.png'),
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.base),

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/app_nav_bar.dart';
 import '../../../shared/models/fixture.dart';
 import '../../../shared/models/league.dart';
 import '../../scores/providers/scores_providers.dart';
@@ -37,13 +38,7 @@ class HomeScreen extends ConsumerWidget {
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundBase,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Golden Goals'),
-        backgroundColor: AppColors.backgroundSurface,
-        border: Border(
-          bottom: BorderSide(color: AppColors.borderSubtle, width: 0.5),
-        ),
-      ),
+      navigationBar: appNavBar(context: context, middle: const Text('Golden Goals')),
       child: SafeArea(
         child: CustomScrollView(
           slivers: [

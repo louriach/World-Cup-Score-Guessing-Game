@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' show Colors;
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../shared/widgets/app_icon.dart';
 
 class AppShell extends StatelessWidget {
   final StatefulNavigationShell shell;
@@ -54,12 +55,7 @@ class _SidebarShell extends StatelessWidget {
     required this.onTap,
   });
 
-  static const _items = [
-    (icon: CupertinoIcons.house_fill, label: 'Home'),
-    (icon: CupertinoIcons.flag_fill, label: 'Scores'),
-    (icon: CupertinoIcons.person_3_fill, label: 'Leagues'),
-    (icon: CupertinoIcons.person_crop_circle_fill, label: 'Me'),
-  ];
+  static const _labels = ['Home', 'Scores', 'Leagues', 'Me'];
 
   @override
   Widget build(BuildContext context) {
@@ -101,52 +97,26 @@ class _SidebarShell extends StatelessWidget {
                     ),
                   ),
                   // Nav items
-                  ...List.generate(_items.length, (i) {
-                    final item = _items[i];
+                  ...List.generate(_labels.length, (i) {
                     final selected = i == currentIndex;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 2),
-                      child: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => onTap(i),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? AppColors.primary.withOpacity(0.12)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
+                    return _HoverNavItem(
+                      key: ValueKey(i),
+                      selected: selected,
+                      onTap: () => onTap(i),
+                      child: Row(
+                        children: [
+                          _sidebarIcon(i, selected),
+                          const SizedBox(width: 12),
+                          Text(
+                            _labels[i],
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                              color: selected ? AppColors.primary : AppColors.textSecondary,
+                              decoration: TextDecoration.none,
+                            ),
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                item.icon,
-                                size: 18,
-                                color: selected
-                                    ? AppColors.primary
-                                    : AppColors.textSecondary,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                item.label,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: selected
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  color: selected
-                                      ? AppColors.primary
-                                      : AppColors.textSecondary,
-                                  decoration: TextDecoration.none,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        ],
                       ),
                     );
                   }),
@@ -170,6 +140,59 @@ class _SidebarShell extends StatelessWidget {
   }
 }
 
+class _HoverNavItem extends StatefulWidget {
+  final bool selected;
+  final VoidCallback onTap;
+  final Widget child;
+  const _HoverNavItem({super.key, required this.selected, required this.onTap, required this.child});
+
+  @override
+  State<_HoverNavItem> createState() => _HoverNavItemState();
+}
+
+class _HoverNavItemState extends State<_HoverNavItem> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: widget.selected
+                  ? AppColors.primary.withOpacity(0.12)
+                  : _hovered
+                      ? AppColors.backgroundElevated
+                      : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: widget.child,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget _sidebarIcon(int index, bool selected) {
+  final color = selected ? AppColors.primary : AppColors.textSecondary;
+  switch (index) {
+    case 0: return AppIcon.home(size: 18, color: color);
+    case 1: return AppIcon.scores(size: 18, color: color);
+    case 2: return AppIcon.leagues(size: 18, color: color);
+    default: return AppIcon.me(size: 18, color: color);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Mobile bottom nav
 // ---------------------------------------------------------------------------
@@ -185,21 +208,25 @@ class _BottomNav extends StatelessWidget {
     return CupertinoTabBar(
       currentIndex: currentIndex,
       onTap: onTap,
-      items: const [
+      items: [
         BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.house_fill),
+          icon: AppIcon.home(size: 22, color: AppColors.textSecondary),
+          activeIcon: AppIcon.home(size: 22, color: AppColors.primary),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.flag_fill),
+          icon: AppIcon.scores(size: 22, color: AppColors.textSecondary),
+          activeIcon: AppIcon.scores(size: 22, color: AppColors.primary),
           label: 'Scores',
         ),
         BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.person_3_fill),
+          icon: AppIcon.leagues(size: 22, color: AppColors.textSecondary),
+          activeIcon: AppIcon.leagues(size: 22, color: AppColors.primary),
           label: 'Leagues',
         ),
         BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.person_crop_circle_fill),
+          icon: AppIcon.me(size: 22, color: AppColors.textSecondary),
+          activeIcon: AppIcon.me(size: 22, color: AppColors.primary),
           label: 'Me',
         ),
       ],
