@@ -269,8 +269,11 @@ class _ScoreDisplay extends StatelessWidget {
         child: Text(
           '? – ?',
           textAlign: TextAlign.center,
-          style: AppTextStyles.scoreMedium
-              .copyWith(color: AppColors.textDisabled),
+          maxLines: 1,
+          style: AppTextStyles.scoreMedium.copyWith(
+            color: AppColors.textDisabled,
+            fontSize: 16,
+          ),
         ),
       );
     }
