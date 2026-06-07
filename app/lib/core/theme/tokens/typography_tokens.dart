@@ -4,7 +4,7 @@ import 'color_tokens.dart';
 abstract class AppTextStyles {
   // --- Display ---
   static const displayLarge = TextStyle(
-    fontSize: 40,
+    fontSize: 32,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     letterSpacing: -0.3,
@@ -13,14 +13,14 @@ abstract class AppTextStyles {
 
   // --- Headings ---
   static const heading1 = TextStyle(
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     letterSpacing: -0.2,
     height: 1.2,
   );
   static const heading2 = TextStyle(
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     letterSpacing: -0.1,
@@ -35,28 +35,32 @@ abstract class AppTextStyles {
 
   // --- Body ---
   static const bodyLarge = TextStyle(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.4,
+    letterSpacing: 0.15,
+    height: 1.5,
   );
   static const bodyLargeBold = TextStyle(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-    height: 1.4,
+    letterSpacing: 0.15,
+    height: 1.5,
   );
   static const body = TextStyle(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.4,
+    letterSpacing: 0.15,
+    height: 1.5,
   );
   static const bodySecondary = TextStyle(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
-    height: 1.4,
+    letterSpacing: 0.15,
+    height: 1.5,
   );
 
   // --- Labels ---
@@ -64,11 +68,13 @@ abstract class AppTextStyles {
     fontSize: 13,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
+    letterSpacing: 0.15,
   );
   static const label = TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
+    letterSpacing: 0.15,
   );
 
   // --- Caption ---
@@ -76,16 +82,18 @@ abstract class AppTextStyles {
     fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
+    letterSpacing: 0.15,
   );
   static const captionBold = TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w600,
     color: AppColors.textSecondary,
+    letterSpacing: 0.15,
   );
 
   // --- Score / numeric display ---
   static const scoreDisplay = TextStyle(
-    fontSize: 48,
+    fontSize: 40,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     fontFeatures: [FontFeature.tabularFigures()],
