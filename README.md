@@ -71,4 +71,4 @@ Live at: https://louriach.github.io/World-Cup-Score-Guessing-Game/app/
 
 ## Author
 
-Luis Ouriach — [luisouriach@gmail.com](mailto:luisouriach@gmail.com)
+Luis Ouriach
