@@ -292,8 +292,11 @@ class _ScoreDisplay extends StatelessWidget {
       child: Text(
         '${guess!.homeScoreGuess} – ${guess!.awayScoreGuess}',
         textAlign: TextAlign.center,
-        style: AppTextStyles.scoreMedium
-            .copyWith(color: AppColors.textPrimary),
+        maxLines: 1,
+        style: AppTextStyles.scoreMedium.copyWith(
+          color: AppColors.textPrimary,
+          fontSize: 16,
+        ),
       ),
     );
   }
