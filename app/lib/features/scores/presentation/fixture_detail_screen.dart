@@ -99,6 +99,11 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
         border: const Border(
           bottom: BorderSide(color: AppColors.borderSubtle, width: 0.5),
         ),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => context.pop(),
+          child: const Icon(CupertinoIcons.back, color: AppColors.primary),
+        ),
       ),
       child: fixtureAsync.when(
         loading: () =>

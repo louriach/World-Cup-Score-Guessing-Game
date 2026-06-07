@@ -50,11 +50,16 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundBase,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Create a league'),
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('Create a league'),
         backgroundColor: AppColors.backgroundSurface,
-        border: Border(
+        border: const Border(
           bottom: BorderSide(color: AppColors.borderSubtle, width: 0.5),
+        ),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => context.pop(),
+          child: const Text('Cancel'),
         ),
       ),
       child: SafeArea(

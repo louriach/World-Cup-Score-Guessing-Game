@@ -57,11 +57,16 @@ class _JoinLeagueScreenState extends ConsumerState<JoinLeagueScreen> {
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundBase,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Join a league'),
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('Join a league'),
         backgroundColor: AppColors.backgroundSurface,
-        border: Border(
+        border: const Border(
           bottom: BorderSide(color: AppColors.borderSubtle, width: 0.5),
+        ),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => context.pop(),
+          child: const Text('Cancel'),
         ),
       ),
       child: SafeArea(
