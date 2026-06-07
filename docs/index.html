@@ -3,28 +3,586 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Golden Goals</title>
+  <title>Golden Goals — Predict every World Cup 2026 score</title>
+  <meta name="description" content="Predict every World Cup 2026 score. Earn points. Beat your mates in private leagues.">
+  <meta property="og:title" content="Golden Goals">
+  <meta property="og:description" content="Predict every World Cup 2026 score. Beat your mates.">
+  <meta property="og:image" content="app/icons/Icon-512.png">
   <style>
-    body { font-family: -apple-system, sans-serif; max-width: 640px; margin: 60px auto; padding: 0 24px; color: #1c1c1e; }
-    h1 { color: #FFD700; }
-    a { color: #FFD700; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #FFD600;
+      --gold-dim: #C9A800;
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1e1e1e;
+      --border: rgba(255,255,255,0.08);
+      --text: #ffffff;
+      --text-secondary: rgba(255,255,255,0.5);
+      --radius: 16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 64px;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    .nav-logo span {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.15s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #000000 !important;
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 100px 24px 80px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 214, 0, 0.1);
+      border: 1px solid rgba(255, 214, 0, 0.25);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 500;
+      margin-bottom: 32px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 72px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .hero h1 span { color: var(--gold); }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+    }
+
+    .hero-ctas .btn {
+      font-size: 15px;
+      padding: 13px 24px;
+    }
+
+    .hero-preview {
+      position: relative;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .hero-preview img {
+      width: 100%;
+      border-radius: 40px;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+    }
+
+    .hero-glow {
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(ellipse at center, rgba(255,214,0,0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* SOCIAL PROOF */
+    .social-proof {
+      text-align: center;
+      padding: 0 24px 80px;
+    }
+
+    .social-proof p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* HOW IT WORKS */
+    section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 56px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .step:hover { border-color: rgba(255,214,0,0.3); }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,214,0,0.1);
+      border: 1px solid rgba(255,214,0,0.25);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .step h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .step p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* SCORING */
+    .scoring-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .score-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+    }
+
+    .score-card .pts {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .score-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .score-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* FEATURES */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .feature h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .feature p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      text-align: center;
+      padding: 80px 24px 100px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .cta-section p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 40px;
+    }
+
+    .cta-section .btn {
+      font-size: 16px;
+      padding: 14px 28px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 16px;
+    }
+
+    footer .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    footer .footer-logo img {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+    }
+
+    footer .footer-logo span {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    footer .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    footer .footer-links a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer .footer-links a:hover { color: var(--text); }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .nav-links .btn-secondary { display: none; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
-  <h1>Golden Goals</h1>
-  <p>Predict every World Cup 2026 score. Beat your mates.</p>
-  <p>Golden Goals is a free score prediction game for the FIFA World Cup 2026. Predict match scores, earn points, and compete in private leagues with friends.</p>
-  <h2>How it works</h2>
-  <ul>
-    <li>Predict the score of every match before kick-off</li>
-    <li>Earn 3 points for an exact score, 1 point for the correct result</li>
-    <li>Create or join private leagues with friends using a code and phrase</li>
-    <li>Get push notifications for match reminders and results</li>
-  </ul>
-  <h2>Legal</h2>
-  <ul>
-    <li><a href="privacy.html">Privacy Policy</a></li>
-    <li><a href="terms.html">Terms of Service</a></li>
-  </ul>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">
+      <img src="app/icons/Icon-192.png" alt="Golden Goals">
+      <span>Golden Goals</span>
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#scoring">Scoring</a>
+      <a href="#features">Features</a>
+      <a href="app/" class="btn btn-primary">Play now →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">
+      ⚽ FIFA World Cup 2026
+    </div>
+    <h1>Predict every score.<br><span>Beat your mates.</span></h1>
+    <p>The free score prediction game for World Cup 2026. Pick results, earn points, and go head-to-head with friends in private leagues.</p>
+    <div class="hero-ctas">
+      <a href="app/" class="btn btn-primary">▶ &nbsp;Play for free</a>
+      <a href="#how-it-works" class="btn btn-secondary">How it works</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Simple to play.<br>Hard to win.</h2>
+    <p class="section-sub">Predict scores before kick-off, rack up points, and see how you stack up against your mates.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Sign in</h3>
+        <p>Sign in with Apple on iOS or via magic link on web. No password needed.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Predict scores</h3>
+        <p>Pick a scoreline for every match before kick-off. Predictions lock 15 minutes before the whistle.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Create a league</h3>
+        <p>Set up a private league and share the code with friends. Anyone can join with the code and phrase.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Climb the table</h3>
+        <p>Points are awarded automatically after each match. Track your rank on the live leaderboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SCORING -->
+  <section id="scoring">
+    <div class="section-label">Scoring</div>
+    <h2 class="section-title">Points that matter.</h2>
+    <p class="section-sub">Exact scores win big. Get the result right and still earn. Every prediction counts.</p>
+    <div class="scoring-grid">
+      <div class="score-card">
+        <div class="pts">3</div>
+        <h3>Exact score</h3>
+        <p>Nail the scoreline exactly</p>
+      </div>
+      <div class="score-card">
+        <div class="pts">1</div>
+        <h3>Correct result</h3>
+        <p>Right winner or draw, wrong score</p>
+      </div>
+      <div class="score-card">
+        <div class="pts">+1</div>
+        <h3>Penalty bonus</h3>
+        <p>Predict the penalty outcome in knockout rounds</p>
+      </div>
+      <div class="score-card">
+        <div class="pts">0</div>
+        <h3>Wrong result</h3>
+        <p>Back to the drawing board</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything included.<br>Nothing to pay.</h2>
+    <p class="section-sub">Golden Goals is completely free. No ads, no in-app purchases.</p>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">🏆</div>
+        <h3>Private leagues</h3>
+        <p>Create a league with a custom name and secret phrase. Share it with mates and compete on your own leaderboard.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔔</div>
+        <h3>Match reminders</h3>
+        <p>Get push notifications 24 hours and 1 hour before kick-off so you never miss a prediction window.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📱</div>
+        <h3>iOS app</h3>
+        <p>Native iOS app with Sign in with Apple. Fast, clean, and built for the World Cup schedule.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌐</div>
+        <h3>Works in any browser</h3>
+        <p>No app store needed. Open the web version on any device and add it to your home screen as a PWA.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>Live results</h3>
+        <p>Scores are settled automatically after each match. Points update in real time across all your leagues.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🆓</div>
+        <h3>Completely free</h3>
+        <p>All 72 group stage matches, unlimited leagues, unlimited predictions. Free forever.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FINAL CTA -->
+  <div class="cta-section">
+    <h2>Ready to play?</h2>
+    <p>World Cup 2026 kicks off June 11. Get your predictions in before the first whistle.</p>
+    <a href="app/" class="btn btn-primary" style="font-size:16px; padding: 14px 32px;">▶ &nbsp;Start predicting</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <a class="footer-logo" href="#">
+      <img src="app/icons/Icon-192.png" alt="Golden Goals">
+      <span>Golden Goals © 2026</span>
+    </a>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="app/">Play</a>
+    </div>
+  </footer>
+
 </body>
 </html>
