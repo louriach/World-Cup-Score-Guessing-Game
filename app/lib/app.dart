@@ -1,6 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show ThemeData, ColorScheme, Colors, MaterialApp, NoSplash;
+import 'package:flutter/material.dart'
+    show
+        Colors,
+        MaterialApp,
+        NoSplash,
+        TextTheme,
+        ThemeData,
+        Typography;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/notifications/push_notification_service.dart';
@@ -16,36 +23,39 @@ class GoldenGoalsApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
 
-    // Give the notification service a reference to the router so
-    // notification taps can navigate regardless of app state.
     PushNotificationService.setRouter(router);
 
-    final child = WebFrame(
-      child: PwaInstallBanner(
-        child: kIsWeb
-            ? MaterialApp.router(
-                title: 'Golden Goals',
-                routerConfig: router,
-                debugShowCheckedModeBanner: false,
-                theme: ThemeData(
-                  colorScheme: ColorScheme.dark(
-                    primary: AppColors.primary,
-                    surface: AppColors.backgroundSurface,
-                  ),
-                  scaffoldBackgroundColor: AppColors.backgroundBase,
-                  splashFactory: NoSplash.splashFactory,
-                  highlightColor: Colors.transparent,
-                ),
-              )
-            : CupertinoApp.router(
-                title: 'Golden Goals',
-                theme: AppTheme.cupertinoTheme,
-                routerConfig: router,
-                debugShowCheckedModeBanner: false,
+    if (kIsWeb) {
+      return MaterialApp.router(
+        title: 'Golden Goals',
+        routerConfig: router,
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: AppColors.backgroundBase,
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+          // Suppress Material link-style underlines on all text
+          textTheme: Typography.material2021().white.apply(
+                bodyColor: AppColors.textPrimary,
+                displayColor: AppColors.textPrimary,
+                decorationColor: Colors.transparent,
               ),
-      ),
-    );
+        ),
+        // builder wraps every route inside the frame + PWA banner
+        builder: (context, child) => WebFrame(
+          child: PwaInstallBanner(
+            child: child!,
+          ),
+        ),
+      );
+    }
 
-    return child;
+    return CupertinoApp.router(
+      title: 'Golden Goals',
+      theme: AppTheme.cupertinoTheme,
+      routerConfig: router,
+      debugShowCheckedModeBanner: false,
+    );
   }
 }
