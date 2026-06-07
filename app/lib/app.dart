@@ -5,9 +5,7 @@ import 'package:flutter/material.dart'
         Colors,
         MaterialApp,
         NoSplash,
-        TextTheme,
-        ThemeData,
-        Typography;
+        ThemeData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/notifications/push_notification_service.dart';
@@ -35,17 +33,17 @@ class GoldenGoalsApp extends ConsumerWidget {
           scaffoldBackgroundColor: AppColors.backgroundBase,
           splashFactory: NoSplash.splashFactory,
           highlightColor: Colors.transparent,
-          // Suppress Material link-style underlines on all text
-          textTheme: Typography.material2021().white.apply(
-                bodyColor: AppColors.textPrimary,
-                displayColor: AppColors.textPrimary,
-                decorationColor: Colors.transparent,
-              ),
         ),
         // builder wraps every route inside the frame + PWA banner
-        builder: (context, child) => WebFrame(
-          child: PwaInstallBanner(
-            child: child!,
+        builder: (context, child) => DefaultTextStyle(
+          style: const TextStyle(
+            decoration: TextDecoration.none,
+            color: AppColors.textPrimary,
+          ),
+          child: WebFrame(
+            child: PwaInstallBanner(
+              child: child!,
+            ),
           ),
         ),
       );
