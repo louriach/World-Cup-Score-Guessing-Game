@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show
+        ColorScheme,
         Colors,
         MaterialApp,
         NoSplash,
@@ -30,19 +31,28 @@ class GoldenGoalsApp extends ConsumerWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           brightness: Brightness.dark,
+          colorScheme: ColorScheme.dark(
+            primary: AppColors.primary,
+            secondary: AppColors.primary,
+            surface: AppColors.backgroundSurface,
+          ),
           scaffoldBackgroundColor: AppColors.backgroundBase,
           splashFactory: NoSplash.splashFactory,
           highlightColor: Colors.transparent,
         ),
-        // builder wraps every route inside the frame + PWA banner
-        builder: (context, child) => DefaultTextStyle(
-          style: const TextStyle(
-            decoration: TextDecoration.none,
-            color: AppColors.textPrimary,
-          ),
-          child: WebFrame(
-            child: PwaInstallBanner(
-              child: child!,
+        builder: (context, child) => CupertinoTheme(
+          // Provide Cupertino theme so all CupertinoWidgets render correctly
+          // inside MaterialApp on web.
+          data: AppTheme.cupertinoTheme,
+          child: DefaultTextStyle(
+            style: const TextStyle(
+              decoration: TextDecoration.none,
+              color: AppColors.textPrimary,
+            ),
+            child: WebFrame(
+              child: PwaInstallBanner(
+                child: child!,
+              ),
             ),
           ),
         ),
