@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -26,9 +27,11 @@ void main() async {
     anonKey: _supabaseAnonKey,
   );
 
-  await Firebase.initializeApp();
-  // Notification permission is requested after sign-in, not at cold start.
-  // PushNotificationService.initialize() is called from auth flow instead.
+  // Firebase is only needed on native platforms for push notifications.
+  // Web uses magic link auth and has no push notifications.
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+  }
 
   runApp(const ProviderScope(child: GoldenGoalsApp()));
 }
