@@ -99,6 +99,14 @@ class AuthRepository {
     });
   }
 
+  /// Send a magic link to the given email address.
+  Future<void> sendMagicLink(String email) async {
+    await _client.auth.signInWithOtp(
+      email: email.trim(),
+      emailRedirectTo: 'https://louriach.github.io/World-Cup-Score-Guessing-Game/app/',
+    );
+  }
+
   Future<void> signOut() async {
     await _client.auth.signOut();
   }

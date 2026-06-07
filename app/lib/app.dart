@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/notifications/push_notification_service.dart';
 import 'core/router/router.dart';
 import 'core/theme/app_theme.dart';
+import 'shared/widgets/pwa_install_banner.dart';
+import 'shared/widgets/web_frame.dart';
 
 class GoldenGoalsApp extends ConsumerWidget {
   const GoldenGoalsApp({super.key});
@@ -16,11 +18,15 @@ class GoldenGoalsApp extends ConsumerWidget {
     // notification taps can navigate regardless of app state.
     PushNotificationService.setRouter(router);
 
-    return CupertinoApp.router(
-      title: 'Golden Goals',
-      theme: AppTheme.cupertinoTheme,
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
+    return WebFrame(
+      child: PwaInstallBanner(
+        child: CupertinoApp.router(
+          title: 'Golden Goals',
+          theme: AppTheme.cupertinoTheme,
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+        ),
+      ),
     );
   }
 }

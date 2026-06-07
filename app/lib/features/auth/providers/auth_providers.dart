@@ -42,6 +42,21 @@ class SignInNotifier extends _$SignInNotifier {
   }
 }
 
+/// Magic link sign-in state.
+@riverpod
+class MagicLinkNotifier extends _$MagicLinkNotifier {
+  @override
+  AsyncValue<bool> build() => const AsyncData(false); // false = not sent yet
+
+  Future<void> sendMagicLink(String email) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(authRepositoryProvider).sendMagicLink(email);
+      return true; // sent successfully
+    });
+  }
+}
+
 /// Onboarding flow state.
 @riverpod
 class OnboardingNotifier extends _$OnboardingNotifier {

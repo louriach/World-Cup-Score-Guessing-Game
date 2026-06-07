@@ -54,7 +54,7 @@ final currentUserProvider = AutoDisposeProvider<User?>.internal(
 );
 
 typedef CurrentUserRef = AutoDisposeProviderRef<User?>;
-String _$signInNotifierHash() => r'8ea1f67c6b995993c5d20b203a212d4592db0ce1';
+String _$signInNotifierHash() => r'0f667951cda2a48b762ae98614a5a69f0a394f9a';
 
 /// Sign-in flow state — tracks loading and error for the sign-in button.
 ///
@@ -72,8 +72,26 @@ final signInNotifierProvider =
 );
 
 typedef _$SignInNotifier = AutoDisposeNotifier<AsyncValue<void>>;
+String _$magicLinkNotifierHash() => r'bf925e7e63f47f8f5e6adf3cdd38729b947052ad';
+
+/// Magic link sign-in state.
+///
+/// Copied from [MagicLinkNotifier].
+@ProviderFor(MagicLinkNotifier)
+final magicLinkNotifierProvider =
+    AutoDisposeNotifierProvider<MagicLinkNotifier, AsyncValue<bool>>.internal(
+  MagicLinkNotifier.new,
+  name: r'magicLinkNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$magicLinkNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$MagicLinkNotifier = AutoDisposeNotifier<AsyncValue<bool>>;
 String _$onboardingNotifierHash() =>
-    r'6b341e646c8be837d15a2d53ec099bda209843a6';
+    r'f68fbfbf3a1fb3d99fab3875ff745bb797b68844';
 
 /// Onboarding flow state.
 ///

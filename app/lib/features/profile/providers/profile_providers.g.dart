@@ -322,7 +322,7 @@ final notificationPreferencesProvider =
 typedef NotificationPreferencesRef
     = AutoDisposeFutureProviderRef<Map<String, bool>>;
 String _$editProfileNotifierHash() =>
-    r'a66e32704000c517e354efa96c4d6d98ad71a24a';
+    r'10052242334b0188f6ea50d41f2de3bc7590c0e2';
 
 /// See also [EditProfileNotifier].
 @ProviderFor(EditProfileNotifier)
