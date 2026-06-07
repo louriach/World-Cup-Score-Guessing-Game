@@ -110,7 +110,7 @@ class _SidebarShell extends StatelessWidget {
                           Text(
                             _labels[i],
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 13,
                               fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                               color: selected ? AppColors.primary : AppColors.textSecondary,
                               decoration: TextDecoration.none,

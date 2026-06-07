@@ -398,11 +398,11 @@ class _SubmitButton extends StatelessWidget {
               : showSuccess
                   ? const Icon(CupertinoIcons.checkmark,
                       key: ValueKey('check'), color: AppColors.textInverse)
-                  : Text(
-                      'Submit prediction',
+                  : DefaultTextStyle.merge(
                       key: const ValueKey('label'),
                       style: AppTextStyles.bodyLargeBold
                           .copyWith(color: AppColors.buttonPrimaryLabel),
+                      child: const Text('Submit prediction'),
                     ),
         ),
       ),

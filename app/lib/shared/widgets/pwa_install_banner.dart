@@ -69,22 +69,9 @@ class _PwaInstallBannerState extends State<PwaInstallBanner> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Add to Home Screen',
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Tap Share ⎙ then "Add to Home Screen"',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 12,
-                        ),
-                      ),
+                      Text('Add to Home Screen', style: AppTextStyles.labelLarge),
+                      const SizedBox(height: 2),
+                      Text('Tap Share ⎙ then "Add to Home Screen"', style: AppTextStyles.caption),
                     ],
                   ),
                 ),

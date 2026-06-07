@@ -794,10 +794,10 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
                 child: state is AsyncLoading
                     ? const CupertinoActivityIndicator(
                         color: AppColors.textInverse)
-                    : Text(
-                        'Save',
+                    : DefaultTextStyle.merge(
                         style: AppTextStyles.bodyLargeBold
                             .copyWith(color: AppColors.buttonPrimaryLabel),
+                        child: const Text('Save'),
                       ),
               ),
             ),

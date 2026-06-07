@@ -164,10 +164,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   child: state is AsyncLoading
                       ? const CupertinoActivityIndicator(
                           color: AppColors.textInverse)
-                      : Text(
-                          'Let\'s go',
+                      : DefaultTextStyle.merge(
                           style: AppTextStyles.bodyLargeBold
                               .copyWith(color: AppColors.buttonPrimaryLabel),
+                          child: const Text('Let\'s go'),
                         ),
                 ),
               ),

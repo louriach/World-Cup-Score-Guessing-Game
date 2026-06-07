@@ -161,12 +161,11 @@ class _MagicLinkFormState extends ConsumerState<_MagicLinkForm> {
                     .sendMagicLink(_emailCtrl.text),
             child: magicState is AsyncLoading
                 ? const CupertinoActivityIndicator()
-                : const Text(
-                    'Send sign-in link',
-                    style: TextStyle(
+                : DefaultTextStyle.merge(
+                    style: AppTextStyles.bodyLargeBold.copyWith(
                       color: AppColors.textInverse,
-                      fontWeight: FontWeight.w600,
                     ),
+                    child: const Text('Send sign-in link'),
                   ),
           ),
         ),
