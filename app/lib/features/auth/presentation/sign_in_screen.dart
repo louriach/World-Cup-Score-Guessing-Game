@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show TextField, InputDecoration, OutlineInputBorder, Colors;
+import 'package:flutter/material.dart' show TextField, InputDecoration, OutlineInputBorder, Colors, Material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -124,27 +124,30 @@ class _MagicLinkFormState extends ConsumerState<_MagicLinkForm> {
 
     return Column(
       children: [
-        TextField(
-          controller: _emailCtrl,
-          keyboardType: TextInputType.emailAddress,
-          autocorrect: false,
-          style: const TextStyle(color: AppColors.textPrimary),
-          decoration: InputDecoration(
-            hintText: 'Email address',
-            hintStyle: const TextStyle(color: AppColors.textSecondary),
-            filled: true,
-            fillColor: AppColors.backgroundSurface,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.button),
-              borderSide: const BorderSide(color: AppColors.borderSubtle),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.button),
-              borderSide: const BorderSide(color: AppColors.borderSubtle),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.button),
-              borderSide: const BorderSide(color: AppColors.primary),
+        Material(
+          color: Colors.transparent,
+          child: TextField(
+            controller: _emailCtrl,
+            keyboardType: TextInputType.emailAddress,
+            autocorrect: false,
+            style: const TextStyle(color: AppColors.textPrimary),
+            decoration: InputDecoration(
+              hintText: 'Email address',
+              hintStyle: const TextStyle(color: AppColors.textSecondary),
+              filled: true,
+              fillColor: AppColors.backgroundSurface,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppRadius.button),
+                borderSide: const BorderSide(color: AppColors.borderSubtle),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppRadius.button),
+                borderSide: const BorderSide(color: AppColors.borderSubtle),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppRadius.button),
+                borderSide: const BorderSide(color: AppColors.primary),
+              ),
             ),
           ),
         ),
