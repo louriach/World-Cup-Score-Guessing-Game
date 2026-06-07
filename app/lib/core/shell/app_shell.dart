@@ -131,8 +131,18 @@ class _DesktopShell extends StatelessWidget {
               ],
             ),
           ),
-          // Page content
-          Expanded(child: shell),
+          // Page content — centred column, max 480px
+          Expanded(
+            child: ColoredBox(
+              color: AppColors.backgroundBase,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: shell,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

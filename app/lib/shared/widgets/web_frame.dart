@@ -11,6 +11,10 @@ class WebFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!kIsWeb) return child;
 
+    // On desktop the AppShell handles its own full-width layout
+    final isDesktop = MediaQuery.of(context).size.width > 600;
+    if (isDesktop) return child;
+
     return ColoredBox(
       color: const Color(0xFF000000),
       child: Center(
