@@ -11,7 +11,7 @@ class WebFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!kIsWeb) return child;
 
-    // On desktop the AppShell handles its own full-width layout
+    // On desktop the sidebar shell handles its own layout
     final isDesktop = MediaQuery.of(context).size.width > 600;
     if (isDesktop) return child;
 

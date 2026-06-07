@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
@@ -16,9 +17,8 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // On wide web screens, show a side nav instead of bottom nav
     if (kIsWeb && MediaQuery.of(context).size.width > 600) {
-      return _DesktopShell(
+      return _SidebarShell(
         shell: shell,
         currentIndex: shell.currentIndex,
         onTap: _onTap,
@@ -40,15 +40,15 @@ class AppShell extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Desktop layout — top nav bar with text tabs
+// Desktop sidebar layout
 // ---------------------------------------------------------------------------
 
-class _DesktopShell extends StatelessWidget {
+class _SidebarShell extends StatelessWidget {
   final StatefulNavigationShell shell;
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const _DesktopShell({
+  const _SidebarShell({
     required this.shell,
     required this.currentIndex,
     required this.onTap,
@@ -63,83 +63,104 @@ class _DesktopShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: AppColors.backgroundBase,
-      child: Column(
+    return ColoredBox(
+      color: AppColors.backgroundBase,
+      child: Row(
         children: [
-          // Top nav bar
+          // ── Left sidebar ──────────────────────────────────────────────
           Container(
-            height: 56,
+            width: 220,
             decoration: const BoxDecoration(
               color: AppColors.backgroundSurface,
               border: Border(
-                bottom: BorderSide(color: AppColors.borderSubtle, width: 0.5),
+                right: BorderSide(color: AppColors.borderSubtle, width: 0.5),
               ),
             ),
-            child: Row(
-              children: [
-                const SizedBox(width: 24),
-                // Logo
-                Image.asset(
-                  'assets/images/app_icon.png',
-                  width: 28,
-                  height: 28,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Golden Goals',
-                  style: AppTextStyles.bodyLargeBold.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-                const Spacer(),
-                // Nav items
-                ...List.generate(_items.length, (i) {
-                  final item = _items[i];
-                  final selected = i == currentIndex;
-                  return CupertinoButton(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    onPressed: () => onTap(i),
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Logo
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
                     child: Row(
                       children: [
-                        Icon(
-                          item.icon,
-                          size: 16,
-                          color: selected
-                              ? AppColors.primary
-                              : AppColors.textSecondary,
+                        Image.asset(
+                          'assets/images/app_icon.png',
+                          width: 32,
+                          height: 32,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 10),
                         Text(
-                          item.label,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: selected
-                                ? FontWeight.w600
-                                : FontWeight.w400,
-                            color: selected
-                                ? AppColors.primary
-                                : AppColors.textSecondary,
-                            decoration: TextDecoration.none,
+                          'Golden Goals',
+                          style: AppTextStyles.bodyLargeBold.copyWith(
+                            color: AppColors.primary,
                           ),
                         ),
                       ],
                     ),
-                  );
-                }),
-                const SizedBox(width: 24),
-              ],
+                  ),
+                  // Nav items
+                  ...List.generate(_items.length, (i) {
+                    final item = _items[i];
+                    final selected = i == currentIndex;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 2),
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () => onTap(i),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? AppColors.primary.withOpacity(0.12)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                item.icon,
+                                size: 18,
+                                color: selected
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                item.label,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: selected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                  color: selected
+                                      ? AppColors.primary
+                                      : AppColors.textSecondary,
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
             ),
           ),
-          // Page content — centred column, max 480px
+
+          // ── Main content ──────────────────────────────────────────────
           Expanded(
-            child: ColoredBox(
-              color: AppColors.backgroundBase,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
-                  child: shell,
-                ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: shell,
               ),
             ),
           ),
