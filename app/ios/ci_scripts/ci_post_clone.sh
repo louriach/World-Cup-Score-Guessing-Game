@@ -58,7 +58,7 @@ if [ -z "$GOOGLE_SERVICE_INFO_PLIST" ]; then
   exit 1
 fi
 echo "$GOOGLE_SERVICE_INFO_PLIST" | base64 --decode \
-  > "$CI_PRIMARY_REPOSITORY_PATH/app/ios/Runner/GoogleService-Info.plist"
+  > "$CI_PRIMARY_REPOSITORY_PATH/app/ios/GoogleService-Info.plist"
 echo "GoogleService-Info.plist written OK"
 
 echo "=== ci_post_clone.sh complete ==="
