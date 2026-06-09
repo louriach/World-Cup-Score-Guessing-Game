@@ -51,4 +51,14 @@ echo "Running pod install (full output follows)..."
 cd "$CI_PRIMARY_REPOSITORY_PATH/app/ios"
 pod install --repo-update 2>&1
 
+# ── GoogleService-Info.plist ───────────────────────────────────────────────
+echo "Writing GoogleService-Info.plist..."
+if [ -z "$GOOGLE_SERVICE_INFO_PLIST" ]; then
+  echo "ERROR: GOOGLE_SERVICE_INFO_PLIST secret is not set in Xcode Cloud environment."
+  exit 1
+fi
+echo "$GOOGLE_SERVICE_INFO_PLIST" | base64 --decode \
+  > "$CI_PRIMARY_REPOSITORY_PATH/app/ios/Runner/GoogleService-Info.plist"
+echo "GoogleService-Info.plist written OK"
+
 echo "=== ci_post_clone.sh complete ==="
