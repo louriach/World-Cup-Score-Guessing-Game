@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show TextField, InputDecoration, OutlineInputBorder, Colors;
+import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -58,7 +59,7 @@ class SignInScreen extends ConsumerWidget {
                   ),
                 ),
               if (kIsWeb)
-                _MagicLinkForm()
+                _OtpForm()
               else
                 SignInWithAppleButton(
                   onPressed: signInState is AsyncLoading
@@ -84,101 +85,216 @@ class SignInScreen extends ConsumerWidget {
   }
 }
 
-class _MagicLinkForm extends ConsumerStatefulWidget {
+class _OtpForm extends ConsumerStatefulWidget {
   @override
-  ConsumerState<_MagicLinkForm> createState() => _MagicLinkFormState();
+  ConsumerState<_OtpForm> createState() => _OtpFormState();
 }
 
-class _MagicLinkFormState extends ConsumerState<_MagicLinkForm> {
+class _OtpFormState extends ConsumerState<_OtpForm> {
   final _emailCtrl = TextEditingController();
+  final _codeCtrl = TextEditingController();
 
   @override
   void dispose() {
     _emailCtrl.dispose();
+    _codeCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final magicState = ref.watch(magicLinkNotifierProvider);
-    final sent = magicState is AsyncData && magicState.value == true;
+    final otpState = ref.watch(otpNotifierProvider);
 
-    if (sent) {
+    // Navigate once verified
+    ref.listen(otpNotifierProvider, (prev, next) async {
+      if (next is! AsyncData || next.value == null) return;
+      if (prev is AsyncLoading) {
+        // Only navigate after verifyOtp succeeds (not after sendOtp)
+        final client = Supabase.instance.client;
+        if (client.auth.currentSession != null) {
+          final repo = ref.read(authRepositoryProvider);
+          final hasProfile = await repo.hasCompletedOnboarding();
+          if (context.mounted) {
+            context.go(hasProfile ? '/home' : '/onboarding');
+          }
+        }
+      }
+    });
+
+    final emailSent = otpState is AsyncData && otpState.value != null;
+    final isLoading = otpState is AsyncLoading;
+
+    if (!emailSent) {
+      // ── Step 1: Enter email ──────────────────────────────────────────────
       return Column(
         children: [
-          const Icon(CupertinoIcons.mail_solid, color: AppColors.primary, size: 40),
+          _EmailField(controller: _emailCtrl),
           const SizedBox(height: AppSpacing.base),
-          Text(
-            'Check your email',
-            style: AppTextStyles.bodyLargeBold,
+          SizedBox(
+            width: double.infinity,
+            child: CupertinoButton(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(AppRadius.button),
+              onPressed: isLoading
+                  ? null
+                  : () => ref
+                      .read(otpNotifierProvider.notifier)
+                      .sendOtp(_emailCtrl.text),
+              child: isLoading
+                  ? const CupertinoActivityIndicator()
+                  : DefaultTextStyle.merge(
+                      style: AppTextStyles.bodyLargeBold
+                          .copyWith(color: AppColors.textInverse),
+                      child: const Text('Send code'),
+                    ),
+            ),
           ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'We sent a sign-in link to ${_emailCtrl.text}',
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodySecondary,
-          ),
+          if (otpState is AsyncError)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Text(
+                'Could not send code. Check your email and try again.',
+                textAlign: TextAlign.center,
+                style: AppTextStyles.caption.copyWith(color: AppColors.error),
+              ),
+            ),
         ],
       );
     }
 
+    // ── Step 2: Enter 6-digit code ───────────────────────────────────────
+    final email = otpState.value!;
     return Column(
       children: [
-        TextField(
-            controller: _emailCtrl,
-            keyboardType: TextInputType.emailAddress,
-            autocorrect: false,
-            style: const TextStyle(color: AppColors.textPrimary),
-            decoration: InputDecoration(
-              hintText: 'Email address',
-              hintStyle: const TextStyle(color: AppColors.textSecondary),
-              filled: true,
-              fillColor: AppColors.backgroundSurface,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppRadius.button),
-                borderSide: const BorderSide(color: AppColors.borderSubtle),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppRadius.button),
-                borderSide: const BorderSide(color: AppColors.borderSubtle),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppRadius.button),
-                borderSide: const BorderSide(color: AppColors.primary),
-              ),
-            ),
+        const Icon(CupertinoIcons.mail_solid, color: AppColors.primary, size: 36),
+        const SizedBox(height: AppSpacing.base),
+        Text('Check your email', style: AppTextStyles.bodyLargeBold),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          'We sent a 6-digit code to $email',
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodySecondary,
         ),
+        const SizedBox(height: AppSpacing.xl),
+        _CodeField(controller: _codeCtrl),
         const SizedBox(height: AppSpacing.base),
         SizedBox(
           width: double.infinity,
           child: CupertinoButton(
             color: AppColors.primary,
             borderRadius: BorderRadius.circular(AppRadius.button),
-            onPressed: magicState is AsyncLoading
+            onPressed: isLoading
                 ? null
                 : () => ref
-                    .read(magicLinkNotifierProvider.notifier)
-                    .sendMagicLink(_emailCtrl.text),
-            child: magicState is AsyncLoading
+                    .read(otpNotifierProvider.notifier)
+                    .verifyOtp(email, _codeCtrl.text),
+            child: isLoading
                 ? const CupertinoActivityIndicator()
                 : DefaultTextStyle.merge(
-                    style: AppTextStyles.bodyLargeBold.copyWith(
-                      color: AppColors.textInverse,
-                    ),
-                    child: const Text('Send sign-in link'),
+                    style: AppTextStyles.bodyLargeBold
+                        .copyWith(color: AppColors.textInverse),
+                    child: const Text('Verify code'),
                   ),
           ),
         ),
-        if (magicState is AsyncError)
+        if (otpState is AsyncError)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.sm),
             child: Text(
-              'Could not send link. Check your email and try again.',
+              'Invalid or expired code. Please try again.',
               textAlign: TextAlign.center,
               style: AppTextStyles.caption.copyWith(color: AppColors.error),
             ),
           ),
+        const SizedBox(height: AppSpacing.base),
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            _codeCtrl.clear();
+            ref.read(otpNotifierProvider.notifier).reset();
+          },
+          child: Text(
+            'Use a different email',
+            style: AppTextStyles.caption
+                .copyWith(color: AppColors.textSecondary),
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class _EmailField extends StatelessWidget {
+  final TextEditingController controller;
+  const _EmailField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.emailAddress,
+      autocorrect: false,
+      style: const TextStyle(color: AppColors.textPrimary),
+      decoration: InputDecoration(
+        hintText: 'Email address',
+        hintStyle: const TextStyle(color: AppColors.textSecondary),
+        filled: true,
+        fillColor: AppColors.backgroundSurface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.button),
+          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.button),
+          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.button),
+          borderSide: const BorderSide(color: AppColors.primary),
+        ),
+      ),
+    );
+  }
+}
+
+class _CodeField extends StatelessWidget {
+  final TextEditingController controller;
+  const _CodeField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      autocorrect: false,
+      maxLength: 6,
+      textAlign: TextAlign.center,
+      style: AppTextStyles.heading2.copyWith(
+        color: AppColors.textPrimary,
+        letterSpacing: 8,
+      ),
+      decoration: InputDecoration(
+        hintText: '000000',
+        counterText: '',
+        hintStyle: AppTextStyles.heading2.copyWith(
+          color: AppColors.textDisabled,
+          letterSpacing: 8,
+        ),
+        filled: true,
+        fillColor: AppColors.backgroundSurface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.button),
+          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.button),
+          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.button),
+          borderSide: const BorderSide(color: AppColors.primary),
+        ),
+      ),
     );
   }
 }

@@ -72,24 +72,24 @@ final signInNotifierProvider =
 );
 
 typedef _$SignInNotifier = AutoDisposeNotifier<AsyncValue<void>>;
-String _$magicLinkNotifierHash() => r'bf925e7e63f47f8f5e6adf3cdd38729b947052ad';
+String _$otpNotifierHash() => r'f7bed9bfbc297c61ae274f42ead674fdf366b19f';
 
-/// Magic link sign-in state.
+/// OTP sign-in state for web PWA.
+/// State is the email address once the code has been sent, null before.
 ///
-/// Copied from [MagicLinkNotifier].
-@ProviderFor(MagicLinkNotifier)
-final magicLinkNotifierProvider =
-    AutoDisposeNotifierProvider<MagicLinkNotifier, AsyncValue<bool>>.internal(
-  MagicLinkNotifier.new,
-  name: r'magicLinkNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$magicLinkNotifierHash,
+/// Copied from [OtpNotifier].
+@ProviderFor(OtpNotifier)
+final otpNotifierProvider =
+    AutoDisposeNotifierProvider<OtpNotifier, AsyncValue<String?>>.internal(
+  OtpNotifier.new,
+  name: r'otpNotifierProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$otpNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$MagicLinkNotifier = AutoDisposeNotifier<AsyncValue<bool>>;
+typedef _$OtpNotifier = AutoDisposeNotifier<AsyncValue<String?>>;
 String _$onboardingNotifierHash() =>
     r'f68fbfbf3a1fb3d99fab3875ff745bb797b68844';
 

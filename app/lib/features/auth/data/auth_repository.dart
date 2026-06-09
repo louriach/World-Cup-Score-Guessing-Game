@@ -99,12 +99,27 @@ class AuthRepository {
     });
   }
 
-  /// Send a magic link to the given email address.
-  Future<void> sendMagicLink(String email) async {
+  /// Send a one-time password (OTP) code to the given email address.
+  /// The user enters the 6-digit code in the app — no link-clicking needed,
+  /// which avoids the iOS PWA / Safari session-isolation problem.
+  Future<void> sendOtp(String email) async {
     await _client.auth.signInWithOtp(
       email: email.trim(),
-      emailRedirectTo: 'https://louriach.github.io/World-Cup-Score-Guessing-Game/app/',
+      // No emailRedirectTo — tells Supabase to send a 6-digit code, not a link.
     );
+  }
+
+  /// Verify the OTP code the user received by email.
+  Future<Session> verifyOtp(String email, String token) async {
+    final response = await _client.auth.verifyOTP(
+      email: email.trim(),
+      token: token.trim(),
+      type: OtpType.email,
+    );
+    if (response.session == null) {
+      throw const AuthException('Verification failed. Please try again.');
+    }
+    return response.session!;
   }
 
   Future<void> signOut() async {

@@ -42,19 +42,32 @@ class SignInNotifier extends _$SignInNotifier {
   }
 }
 
-/// Magic link sign-in state.
+/// OTP sign-in state for web PWA.
+/// State is the email address once the code has been sent, null before.
 @riverpod
-class MagicLinkNotifier extends _$MagicLinkNotifier {
+class OtpNotifier extends _$OtpNotifier {
   @override
-  AsyncValue<bool> build() => const AsyncData(false); // false = not sent yet
+  AsyncValue<String?> build() => const AsyncData(null);
 
-  Future<void> sendMagicLink(String email) async {
+  /// Step 1 — send the 6-digit code to [email].
+  Future<void> sendOtp(String email) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(authRepositoryProvider).sendMagicLink(email);
-      return true; // sent successfully
+      await ref.read(authRepositoryProvider).sendOtp(email);
+      return email; // non-null = code sent, show code entry screen
     });
   }
+
+  /// Step 2 — verify the code the user typed.
+  Future<void> verifyOtp(String email, String token) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(authRepositoryProvider).verifyOtp(email, token);
+      return email;
+    });
+  }
+
+  void reset() => state = const AsyncData(null);
 }
 
 /// Onboarding flow state.
