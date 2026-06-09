@@ -29,6 +29,11 @@ class SignInScreen extends ConsumerWidget {
       }
     });
 
+    // On web, hide logo/tagline once the code-entry step is shown
+    // so the layout doesn't jump when the form grows.
+    final showingCodeEntry = kIsWeb &&
+        ref.watch(otpNotifierProvider).valueOrNull != null;
+
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundBase,
       child: SafeArea(
@@ -37,14 +42,28 @@ class SignInScreen extends ConsumerWidget {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              _Logo(),
-              const SizedBox(height: AppSpacing.xl),
-              Text(
-                'Predict every score.\nBeat your mates.',
-                textAlign: TextAlign.center,
-                style: AppTextStyles.heading2.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.4,
+              AnimatedOpacity(
+                opacity: showingCodeEntry ? 0.0 : 1.0,
+                duration: AppDurations.fast,
+                child: AnimatedSize(
+                  duration: AppDurations.fast,
+                  curve: Curves.easeInOut,
+                  child: showingCodeEntry
+                      ? const SizedBox.shrink()
+                      : Column(
+                          children: [
+                            _Logo(),
+                            const SizedBox(height: AppSpacing.xl),
+                            Text(
+                              'Predict every score.\nBeat your mates.',
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.heading2.copyWith(
+                                color: AppColors.textSecondary,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
               const Spacer(flex: 3),
