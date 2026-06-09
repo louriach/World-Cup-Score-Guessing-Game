@@ -33,6 +33,10 @@ if [ ! -f "$XCCONFIG" ]; then
 fi
 echo "Generated.xcconfig OK"
 
+# ── Precache iOS engine artifacts (required before pod install) ────────────
+echo "Running flutter precache --ios..."
+flutter precache --ios
+
 # ── CocoaPods ─────────────────────────────────────────────────────────────
 echo "Installing CocoaPods via Homebrew..."
 if command -v pod &>/dev/null; then
