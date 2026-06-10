@@ -44,17 +44,28 @@
       background-color: #000000;
       overflow: hidden;
     }
+    /* Fix grey screen on iOS when keyboard appears */
+    flt-glass-pane, flutter-view {
+      height: 100% !important;
+    }
   </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
-
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <script>
+    // On iOS Safari, when the keyboard appears the visual viewport shrinks
+    // but Flutter's canvas doesn't redraw — leaving a grey area.
+    // Force the Flutter element to match the visual viewport height.
+    if (window.visualViewport) {
+      function onViewportResize() {
+        var vh = window.visualViewport.height;
+        document.body.style.height = vh + 'px';
+        var flutter = document.querySelector('flt-glass-pane');
+        if (flutter) flutter.style.height = vh + 'px';
+      }
+      window.visualViewport.addEventListener('resize', onViewportResize);
+      window.visualViewport.addEventListener('scroll', onViewportResize);
+    }
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
