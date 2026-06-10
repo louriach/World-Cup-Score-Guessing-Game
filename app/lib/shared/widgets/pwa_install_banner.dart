@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/theme/app_theme.dart';
 
@@ -28,16 +28,12 @@ class _PwaInstallBannerState extends State<PwaInstallBanner> {
     }
   }
 
-  bool get _isAuthRoute {
-    final location = GoRouterState.of(context).uri.toString();
-    return location == '/' ||
-        location.startsWith('/sign-in') ||
-        location.startsWith('/onboarding');
-  }
+  bool get _isSignedIn =>
+      Supabase.instance.client.auth.currentUser != null;
 
   @override
   Widget build(BuildContext context) {
-    if (!kIsWeb || !_show || _isAuthRoute) return widget.child;
+    if (!kIsWeb || !_show || !_isSignedIn) return widget.child;
 
     return Stack(
       children: [
