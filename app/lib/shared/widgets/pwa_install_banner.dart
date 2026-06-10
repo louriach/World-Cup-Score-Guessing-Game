@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 
 /// Shows a one-time "Add to Home Screen" prompt on web.
+/// Only shown when the user is on an authenticated route (not sign-in/onboarding).
 class PwaInstallBanner extends StatefulWidget {
   final Widget child;
   const PwaInstallBanner({super.key, required this.child});
@@ -14,26 +16,34 @@ class PwaInstallBanner extends StatefulWidget {
 
 class _PwaInstallBannerState extends State<PwaInstallBanner> {
   bool _show = false;
+  bool _dismissed = false;
 
   @override
   void initState() {
     super.initState();
     if (kIsWeb) {
-      Future.delayed(const Duration(seconds: 4), () {
-        if (mounted) setState(() => _show = true);
+      Future.delayed(const Duration(seconds: 5), () {
+        if (mounted && !_dismissed) setState(() => _show = true);
       });
     }
   }
 
+  bool get _isAuthRoute {
+    final location = GoRouterState.of(context).uri.toString();
+    return location == '/' ||
+        location.startsWith('/sign-in') ||
+        location.startsWith('/onboarding');
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (!kIsWeb || !_show) return widget.child;
+    if (!kIsWeb || !_show || _isAuthRoute) return widget.child;
 
     return Stack(
       children: [
         widget.child,
         Positioned(
-          bottom: 80,
+          bottom: 100,
           left: 16,
           right: 16,
           child: Container(
@@ -77,7 +87,7 @@ class _PwaInstallBannerState extends State<PwaInstallBanner> {
                 ),
                 CupertinoButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () => setState(() => _show = false),
+                  onPressed: () => setState(() { _show = false; _dismissed = true; }),
                   child: const Icon(
                     CupertinoIcons.xmark_circle_fill,
                     color: AppColors.textSecondary,
