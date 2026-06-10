@@ -327,14 +327,17 @@ class _Logo extends StatelessWidget {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: AppColors.backgroundElevated,
             borderRadius: BorderRadius.circular(AppRadius.lg),
             boxShadow: AppShadows.goldGlow,
+            border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 1),
           ),
-          child: Image.asset(
-            'assets/images/app_icon.png',
-            width: 56,
-            height: 56,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            child: Image.asset(
+              'assets/images/app_icon.png',
+              fit: BoxFit.contain,
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.base),
