@@ -33021,7 +33021,7 @@ var $async$aS8=A.p(function(a,b){if(a===1)return A.q(b,r)
 for(;;)switch(s){case 0:if($.W==null)A.aBT()
 $.W.toString
 s=2
-return A.n(A.azi("",""),$async$aS8)
+return A.n(A.azi("sb_publishable_nmuGWO3sHRVMK9Z1rXSV-w_0DuD03JZ","https://abmzwhjuisawlywmzapd.supabase.co"),$async$aS8)
 case 2:if($.W==null)A.aBT()
 q=$.W
 q.toString
