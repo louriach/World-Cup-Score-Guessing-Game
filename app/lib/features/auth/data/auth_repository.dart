@@ -110,16 +110,22 @@ class AuthRepository {
   }
 
   /// Verify the OTP code the user received by email.
+  /// New users get a signup token; existing users get an email token.
+  /// Try both types so either works transparently.
   Future<Session> verifyOtp(String email, String token) async {
-    final response = await _client.auth.verifyOTP(
-      email: email.trim(),
-      token: token.trim(),
-      type: OtpType.email,
-    );
-    if (response.session == null) {
-      throw const AuthException('Verification failed. Please try again.');
+    for (final type in [OtpType.email, OtpType.signup]) {
+      try {
+        final response = await _client.auth.verifyOTP(
+          email: email.trim(),
+          token: token.trim(),
+          type: type,
+        );
+        if (response.session != null) return response.session!;
+      } catch (_) {
+        // Try next type
+      }
     }
-    return response.session!;
+    throw const AuthException('Invalid or expired code. Please request a new one.');
   }
 
   Future<void> signOut() async {
