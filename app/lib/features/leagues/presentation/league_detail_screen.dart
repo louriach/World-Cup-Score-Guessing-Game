@@ -21,7 +21,8 @@ class LeagueDetailScreen extends ConsumerWidget {
     final currentUserId = Supabase.instance.client.auth.currentUser!.id;
 
     final league = leaguesAsync.valueOrNull
-        ?.firstWhere((l) => l.id == leagueId, orElse: () => throw StateError(''));
+        ?.where((l) => l.id == leagueId)
+        .firstOrNull;
 
     final isAdmin = league?.adminUserId == currentUserId;
 

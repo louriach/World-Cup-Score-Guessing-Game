@@ -4,7 +4,6 @@ import 'package:flutter/material.dart' show TextField, InputDecoration, OutlineI
 import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../core/notifications/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -15,23 +14,9 @@ class SignInScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final signInState = ref.watch(signInNotifierProvider);
-
-    ref.listen(signInNotifierProvider, (_, next) async {
-      if (next is! AsyncData) return;
-      if (next is AsyncData) {
-        final repo = ref.read(authRepositoryProvider);
-        final hasProfile = await repo.hasCompletedOnboarding();
-        if (!kIsWeb) await PushNotificationService.initialize();
-        if (context.mounted) {
-          context.go(hasProfile ? '/home' : '/onboarding');
-        }
-      }
-    });
-
     // On web, hide logo/tagline once the code-entry step is shown
     // so the layout doesn't jump when the form grows.
-    final showingCodeEntry = kIsWeb &&
+    final showingCodeEntry =
         ref.watch(otpNotifierProvider).valueOrNull != null;
 
     return CupertinoPageScaffold(
@@ -67,28 +52,7 @@ class SignInScreen extends ConsumerWidget {
                 ),
               ),
               const Spacer(flex: 3),
-              if (signInState is AsyncError)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.base),
-                  child: Text(
-                    '${(signInState as AsyncError).error}',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodySecondary
-                        .copyWith(color: AppColors.error),
-                  ),
-                ),
-              if (kIsWeb)
-                _OtpForm()
-              else
-                SignInWithAppleButton(
-                  onPressed: signInState is AsyncLoading
-                      ? () {}
-                      : () => ref
-                          .read(signInNotifierProvider.notifier)
-                          .signInWithApple(),
-                  style: SignInWithAppleButtonStyle.black,
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                ),
+              _OtpForm(),
               const SizedBox(height: AppSpacing.base),
               Text(
                 'By signing in you agree to our Terms of Service\nand Privacy Policy.',
@@ -133,6 +97,7 @@ class _OtpFormState extends ConsumerState<_OtpForm> {
         if (client.auth.currentSession != null) {
           final repo = ref.read(authRepositoryProvider);
           final hasProfile = await repo.hasCompletedOnboarding();
+          if (!kIsWeb) await PushNotificationService.initialize();
           if (context.mounted) {
             context.go(hasProfile ? '/home' : '/onboarding');
           }

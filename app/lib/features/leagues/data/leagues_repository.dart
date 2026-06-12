@@ -65,11 +65,14 @@ class LeaguesRepository {
     required String code,
     required String phrase,
   }) async {
+    final normalisedCode = code.trim();
+    final normalisedPhrase = _normalisePhrase(phrase);
+
     final data = await _client
         .from('leagues')
         .select()
-        .eq('join_code', code.trim())
-        .eq('join_phrase', _normalisePhrase(phrase))
+        .eq('join_code', normalisedCode)
+        .eq('join_phrase', normalisedPhrase)
         .maybeSingle();
 
     if (data == null) {
@@ -117,8 +120,13 @@ class LeaguesRepository {
   }
 
   /// Lowercase and hyphenate a phrase for consistent storage.
-  String _normalisePhrase(String phrase) =>
-      phrase.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '-');
+  /// Collapses any combination of spaces/hyphens into a single hyphen
+  /// and strips leading/trailing hyphens.
+  String _normalisePhrase(String phrase) => phrase
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[\s\-]+'), '-')
+      .replaceAll(RegExp(r'^-|-$'), '');
 }
 
 class LeagueJoinException implements Exception {

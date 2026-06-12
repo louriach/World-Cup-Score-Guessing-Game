@@ -42,6 +42,7 @@ class _JoinLeagueScreenState extends ConsumerState<JoinLeagueScreen> {
 
     ref.listen(joinLeagueNotifierProvider, (_, next) {
       if (next case AsyncData(value: final League league?)) {
+        ref.invalidate(myLeaguesProvider);
         context.go('/leagues/${league.id}');
       }
     });
