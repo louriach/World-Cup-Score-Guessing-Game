@@ -142,6 +142,7 @@ class _OtpFormState extends ConsumerState<_OtpForm> {
 
     final emailSent = otpState is AsyncData && otpState.value != null;
     final isLoading = otpState is AsyncLoading;
+    final codeReady = _codeCtrl.text.trim().length == 6;
 
     if (!emailSent) {
       // ── Step 1: Enter email ──────────────────────────────────────────────
@@ -195,14 +196,14 @@ class _OtpFormState extends ConsumerState<_OtpForm> {
           style: AppTextStyles.bodySecondary,
         ),
         const SizedBox(height: AppSpacing.xl),
-        _CodeField(controller: _codeCtrl),
+        _CodeField(controller: _codeCtrl..addListener(() => setState(() {}))),
         const SizedBox(height: AppSpacing.base),
         SizedBox(
           width: double.infinity,
           child: CupertinoButton(
-            color: AppColors.primary,
+            color: codeReady ? AppColors.primary : AppColors.buttonDisabled,
             borderRadius: BorderRadius.circular(AppRadius.button),
-            onPressed: isLoading
+            onPressed: (isLoading || !codeReady)
                 ? null
                 : () => ref
                     .read(otpNotifierProvider.notifier)
@@ -284,8 +285,12 @@ class _CodeField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
-      keyboardType: TextInputType.number,
+      // Use text keyboard — more reliably captured on iOS Safari PWA
+      // than the number pad, which can silently drop input.
+      keyboardType: TextInputType.text,
       autocorrect: false,
+      autocapitalize: TextCapitalization.none,
+      enableSuggestions: false,
       maxLength: 6,
       textAlign: TextAlign.center,
       style: AppTextStyles.heading2.copyWith(
