@@ -289,7 +289,7 @@ class _CodeField extends StatelessWidget {
       // than the number pad, which can silently drop input.
       keyboardType: TextInputType.text,
       autocorrect: false,
-      autocapitalize: TextCapitalization.none,
+      textCapitalization: TextCapitalization.none,
       enableSuggestions: false,
       maxLength: 8,
       textAlign: TextAlign.center,
