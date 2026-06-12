@@ -142,7 +142,7 @@ class _OtpFormState extends ConsumerState<_OtpForm> {
 
     final emailSent = otpState is AsyncData && otpState.value != null;
     final isLoading = otpState is AsyncLoading;
-    final codeReady = _codeCtrl.text.trim().length == 6;
+    final codeReady = _codeCtrl.text.trim().length >= 6;
 
     if (!emailSent) {
       // ── Step 1: Enter email ──────────────────────────────────────────────
@@ -191,7 +191,7 @@ class _OtpFormState extends ConsumerState<_OtpForm> {
         Text('Check your email', style: AppTextStyles.bodyLargeBold),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          'We sent a 6-digit code to $email',
+          'We sent a sign-in code to $email',
           textAlign: TextAlign.center,
           style: AppTextStyles.bodySecondary,
         ),
@@ -291,14 +291,14 @@ class _CodeField extends StatelessWidget {
       autocorrect: false,
       autocapitalize: TextCapitalization.none,
       enableSuggestions: false,
-      maxLength: 6,
+      maxLength: 8,
       textAlign: TextAlign.center,
       style: AppTextStyles.heading2.copyWith(
         color: AppColors.textPrimary,
         letterSpacing: 8,
       ),
       decoration: InputDecoration(
-        hintText: '000000',
+        hintText: '00000000',
         counterText: '',
         hintStyle: AppTextStyles.heading2.copyWith(
           color: AppColors.textDisabled,
