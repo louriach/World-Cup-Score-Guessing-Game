@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show TextField, InputDecoration, OutlineInputBorder, Colors;
 import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -215,28 +214,24 @@ class _EmailField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: TextInputType.emailAddress,
-      autocorrect: false,
-      style: const TextStyle(color: AppColors.textPrimary),
-      decoration: InputDecoration(
-        hintText: 'Email address',
-        hintStyle: const TextStyle(color: AppColors.textSecondary),
-        filled: true,
-        fillColor: AppColors.backgroundSurface,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.backgroundSurface,
+        borderRadius: BorderRadius.circular(AppRadius.button),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: CupertinoTextField(
+        controller: controller,
+        keyboardType: TextInputType.emailAddress,
+        autocorrect: false,
+        placeholder: 'Email address',
+        placeholderStyle: const TextStyle(color: AppColors.textSecondary),
+        style: const TextStyle(color: AppColors.textPrimary),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.base,
+          vertical: AppSpacing.base,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          borderSide: const BorderSide(color: AppColors.primary),
-        ),
+        decoration: null,
       ),
     );
   }
@@ -248,41 +243,33 @@ class _CodeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      // Use text keyboard — more reliably captured on iOS Safari PWA
-      // than the number pad, which can silently drop input.
-      keyboardType: TextInputType.text,
-      autocorrect: false,
-      textCapitalization: TextCapitalization.none,
-      enableSuggestions: false,
-      maxLength: 8,
-      textAlign: TextAlign.center,
-      style: AppTextStyles.heading2.copyWith(
-        color: AppColors.textPrimary,
-        letterSpacing: 8,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.backgroundSurface,
+        borderRadius: BorderRadius.circular(AppRadius.button),
+        border: Border.all(color: AppColors.borderSubtle),
       ),
-      decoration: InputDecoration(
-        hintText: '00000000',
-        counterText: '',
-        hintStyle: AppTextStyles.heading2.copyWith(
+      child: CupertinoTextField(
+        controller: controller,
+        keyboardType: TextInputType.text,
+        autocorrect: false,
+        enableSuggestions: false,
+        maxLength: 8,
+        textAlign: TextAlign.center,
+        placeholder: '00000000',
+        placeholderStyle: AppTextStyles.heading2.copyWith(
           color: AppColors.textDisabled,
           letterSpacing: 8,
         ),
-        filled: true,
-        fillColor: AppColors.backgroundSurface,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        style: AppTextStyles.heading2.copyWith(
+          color: AppColors.textPrimary,
+          letterSpacing: 8,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.base,
+          vertical: AppSpacing.base,
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          borderSide: const BorderSide(color: AppColors.primary),
-        ),
+        decoration: null,
       ),
     );
   }
