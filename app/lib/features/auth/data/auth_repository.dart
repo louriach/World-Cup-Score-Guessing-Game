@@ -1,47 +1,10 @@
-import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepository {
   final _client = Supabase.instance.client;
-
-  /// Sign in with Apple.
-  /// Returns the Supabase [Session] on success.
-  /// Throws [AuthException] or [SignInWithAppleException] on failure.
-  Future<Session> signInWithApple() async {
-    // Generate a secure nonce to prevent replay attacks.
-    final rawNonce = _generateNonce();
-    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: hashedNonce,
-    );
-
-    final idToken = appleCredential.identityToken;
-    if (idToken == null) {
-      throw const AuthException('Apple did not return an identity token.');
-    }
-
-    final response = await _client.auth.signInWithIdToken(
-      provider: OAuthProvider.apple,
-      idToken: idToken,
-      nonce: rawNonce,
-    );
-
-    if (response.session == null) {
-      throw const AuthException('Supabase sign-in returned no session.');
-    }
-
-    return response.session!;
-  }
 
   /// Returns true if the current user has completed onboarding
   /// (i.e. a row exists in public.users with a username).
@@ -132,12 +95,4 @@ class AuthRepository {
     await _client.auth.signOut();
   }
 
-  // Generates a cryptographically secure random nonce string.
-  String _generateNonce([int length = 32]) {
-    const chars =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    final random = Random.secure();
-    return List.generate(length, (_) => chars[random.nextInt(chars.length)])
-        .join();
-  }
 }

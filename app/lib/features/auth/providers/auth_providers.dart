@@ -24,25 +24,7 @@ User? currentUser(Ref ref) {
   return Supabase.instance.client.auth.currentUser;
 }
 
-/// Sign-in flow state — tracks loading and error for the sign-in button.
-@riverpod
-class SignInNotifier extends _$SignInNotifier {
-  @override
-  AsyncValue<void> build() => const AsyncData(null);
-
-  Future<void> signInWithApple() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(authRepositoryProvider).signInWithApple(),
-    );
-    if (state is AsyncError) {
-      final err = (state as AsyncError).error;
-      print('SIGN IN ERROR: $err');
-    }
-  }
-}
-
-/// OTP sign-in state for web PWA.
+/// OTP sign-in state.
 /// State is the email address once the code has been sent, null before.
 @riverpod
 class OtpNotifier extends _$OtpNotifier {

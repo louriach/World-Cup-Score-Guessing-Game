@@ -54,27 +54,9 @@ final currentUserProvider = AutoDisposeProvider<User?>.internal(
 );
 
 typedef CurrentUserRef = AutoDisposeProviderRef<User?>;
-String _$signInNotifierHash() => r'0f667951cda2a48b762ae98614a5a69f0a394f9a';
-
-/// Sign-in flow state — tracks loading and error for the sign-in button.
-///
-/// Copied from [SignInNotifier].
-@ProviderFor(SignInNotifier)
-final signInNotifierProvider =
-    AutoDisposeNotifierProvider<SignInNotifier, AsyncValue<void>>.internal(
-  SignInNotifier.new,
-  name: r'signInNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$signInNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SignInNotifier = AutoDisposeNotifier<AsyncValue<void>>;
 String _$otpNotifierHash() => r'f7bed9bfbc297c61ae274f42ead674fdf366b19f';
 
-/// OTP sign-in state for web PWA.
+/// OTP sign-in state.
 /// State is the email address once the code has been sent, null before.
 ///
 /// Copied from [OtpNotifier].
