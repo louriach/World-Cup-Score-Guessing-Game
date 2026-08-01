@@ -95,4 +95,11 @@ class AuthRepository {
     await _client.auth.signOut();
   }
 
+  /// Permanently delete the current user's account and all their data.
+  /// Calls a Supabase SQL function that runs with elevated privileges
+  /// to remove the auth.users record (and cascades to public data).
+  Future<void> deleteAccount() async {
+    await _client.rpc('delete_user');
+    await _client.auth.signOut();
+  }
 }
