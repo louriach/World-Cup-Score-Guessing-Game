@@ -546,6 +546,12 @@ class _SettingsTabState extends ConsumerState<_SettingsTab> {
             isDestructive: true,
             onTap: () => _confirmSignOut(context),
           ),
+          _SettingsDivider(),
+          _ActionRow(
+            label: 'Delete account',
+            isDestructive: true,
+            onTap: () => _confirmDeleteAccount(context),
+          ),
         ]),
 
         const SizedBox(height: AppSpacing.xxxl),
@@ -560,21 +566,49 @@ class _SettingsTabState extends ConsumerState<_SettingsTab> {
   void _confirmSignOut(BuildContext context) {
     showCupertinoDialog<void>(
       context: context,
-      builder: (_) => CupertinoAlertDialog(
+      builder: (dialogContext) => CupertinoAlertDialog(
         title: const Text('Sign out'),
         content: const Text('Are you sure you want to sign out?'),
         actions: [
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               await ref.read(authRepositoryProvider).signOut();
               if (context.mounted) context.go('/sign-in');
             },
             child: const Text('Sign out'),
           ),
           CupertinoDialogAction(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteAccount(BuildContext context) {
+    showCupertinoDialog<void>(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: const Text('Delete account'),
+        content: const Text(
+          'This will permanently delete your account and all your data. This cannot be undone.',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await ref.read(authRepositoryProvider).deleteAccount();
+              if (context.mounted) context.go('/sign-in');
+            },
+            child: const Text('Delete account'),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
         ],
@@ -645,19 +679,23 @@ class _ActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.cardPadding,
-        vertical: AppSpacing.md,
-      ),
-      onPressed: onTap,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          label,
-          style: AppTextStyles.body.copyWith(
-            color: isDestructive ? AppColors.error : AppColors.textPrimary,
-          ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.cardPadding,
+          vertical: AppSpacing.base,
+        ),
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: AppTextStyles.body.copyWith(
+                color: isDestructive ? AppColors.error : AppColors.textPrimary,
+              ),
+            ),
+          ],
         ),
       ),
     );
