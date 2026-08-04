@@ -3,6 +3,10 @@ import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// Demo credentials for App Store review only.
+const _demoEmail = 'review@goldengoals.app';
+const _demoCode = 'Rk7mXq2w';
+
 class AuthRepository {
   final _client = Supabase.instance.client;
 
@@ -76,6 +80,16 @@ class AuthRepository {
   /// New users get a signup token; existing users get an email token.
   /// Try both types so either works transparently.
   Future<Session> verifyOtp(String email, String token) async {
+    // Demo account bypass for App Store review.
+    if (email.trim().toLowerCase() == _demoEmail &&
+        token.trim() == _demoCode) {
+      final response = await _client.auth.signInWithPassword(
+        email: _demoEmail,
+        password: _demoCode,
+      );
+      if (response.session != null) return response.session!;
+    }
+
     for (final type in [OtpType.email, OtpType.signup]) {
       try {
         final response = await _client.auth.verifyOTP(
