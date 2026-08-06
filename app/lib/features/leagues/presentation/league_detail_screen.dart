@@ -10,12 +10,21 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/league.dart';
 import '../providers/leagues_providers.dart';
 
-class LeagueDetailScreen extends ConsumerWidget {
+class LeagueDetailScreen extends ConsumerStatefulWidget {
   final String leagueId;
   const LeagueDetailScreen({super.key, required this.leagueId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LeagueDetailScreen> createState() => _LeagueDetailScreenState();
+}
+
+class _LeagueDetailScreenState extends ConsumerState<LeagueDetailScreen> {
+  final _shareButtonKey = GlobalKey();
+
+  String get leagueId => widget.leagueId;
+
+  @override
+  Widget build(BuildContext context) {
     final leaguesAsync = ref.watch(myLeaguesProvider);
     final leaderboardAsync = ref.watch(leaderboardProvider(leagueId));
     final currentUserId = Supabase.instance.client.auth.currentUser!.id;
@@ -36,6 +45,7 @@ class LeagueDetailScreen extends ConsumerWidget {
         ),
         trailing: league != null
             ? CupertinoButton(
+                key: _shareButtonKey,
                 padding: EdgeInsets.zero,
                 child: const Icon(CupertinoIcons.share,
                     color: AppColors.primary, size: 20),
@@ -108,8 +118,13 @@ class LeagueDetailScreen extends ConsumerWidget {
   }
 
   void _share(League league) {
+    final box = _shareButtonKey.currentContext?.findRenderObject() as RenderBox?;
+    final rect = box != null
+        ? box.localToGlobal(Offset.zero) & box.size
+        : Rect.fromLTWH(0, 0, 100, 100);
     Share.share(
       'Join my Golden Goals league!\n\nLeague: ${league.name}\nCode: ${league.joinCode}\nPhrase: ${league.joinPhrase}',
+      sharePositionOrigin: rect,
     );
   }
 
