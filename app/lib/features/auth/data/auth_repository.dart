@@ -70,6 +70,9 @@ class AuthRepository {
   /// The user enters the 6-digit code in the app — no link-clicking needed,
   /// which avoids the iOS PWA / Safari session-isolation problem.
   Future<void> sendOtp(String email) async {
+    // Demo account: skip the real OTP send so no email error is shown.
+    if (email.trim().toLowerCase() == _demoEmail) return;
+
     await _client.auth.signInWithOtp(
       email: email.trim(),
       // No emailRedirectTo — tells Supabase to send a 6-digit code, not a link.
