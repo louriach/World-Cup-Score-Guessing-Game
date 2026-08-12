@@ -277,10 +277,15 @@ class _LeaderboardRow extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(member.username,
+                      Flexible(
+                        child: Text(
+                          member.username,
+                          overflow: TextOverflow.ellipsis,
                           style: isCurrentUser
                               ? AppTextStyles.bodyLargeBold
-                              : AppTextStyles.body),
+                              : AppTextStyles.body,
+                        ),
+                      ),
                       if (isLeagueAdmin) ...[
                         const SizedBox(width: AppSpacing.xs),
                         Container(
