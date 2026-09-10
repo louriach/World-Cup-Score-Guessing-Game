@@ -66,6 +66,11 @@ GoRouter router(Ref ref) {
     routes: [
       GoRoute(path: '/sign-in', pageBuilder: (_, __) => _fadePage(const SignInScreen())),
       GoRoute(path: '/onboarding', pageBuilder: (_, __) => _fadePage(const OnboardingScreen())),
+      GoRoute(
+        path: '/scores/:fixtureId',
+        pageBuilder: (_, state) =>
+            _fadePage(FixtureDetailScreen(fixtureId: state.pathParameters['fixtureId']!)),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),
         branches: [
@@ -76,13 +81,6 @@ GoRouter router(Ref ref) {
             GoRoute(
               path: '/scores',
               pageBuilder: (_, __) => _fadePage(const ScoresScreen()),
-              routes: [
-                GoRoute(
-                  path: ':fixtureId',
-                  pageBuilder: (_, state) =>
-                      _fadePage(FixtureDetailScreen(fixtureId: state.pathParameters['fixtureId']!)),
-                ),
-              ],
             ),
           ]),
           StatefulShellBranch(routes: [
