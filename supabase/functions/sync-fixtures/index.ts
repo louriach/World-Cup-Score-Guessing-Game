@@ -5,7 +5,7 @@ const FOOTBALL_API_KEY = Deno.env.get("FOOTBALL_DATA_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SERVICE_ROLE_KEY")!;
 
-const COMPETITION_CODE = "WC"; // football-data.org code for FIFA World Cup
+const COMPETITION_CODE = "PL"; // football-data.org code for Premier League
 const API_BASE = "https://api.football-data.org/v4";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/competitions/${COMPETITION_CODE}/matches`, {
+    const res = await fetch(`${API_BASE}/competitions/${COMPETITION_CODE}/matches?season=2026`, {
       headers: { "X-Auth-Token": FOOTBALL_API_KEY },
     });
 
@@ -39,8 +39,8 @@ Deno.serve(async (req) => {
         external_id: String(m.id),
         matchday: m.matchday,
         stage: normaliseStage(m.stage),
-        home_team: m.homeTeam.name,
-        away_team: m.awayTeam.name,
+        home_team: m.homeTeam.shortName ?? m.homeTeam.name,
+        away_team: m.awayTeam.shortName ?? m.awayTeam.name,
         home_crest_url: m.homeTeam.crest ?? null,
         away_crest_url: m.awayTeam.crest ?? null,
         kickoff_time: kickoff.toISOString(),
@@ -71,13 +71,14 @@ Deno.serve(async (req) => {
 
 function normaliseStage(stage: string): string {
   const map: Record<string, string> = {
+    "REGULAR_SEASON": "group",
     "GROUP_STAGE": "group",
     "ROUND_OF_16": "round_of_16",
     "QUARTER_FINALS": "quarter_final",
     "SEMI_FINALS": "semi_final",
     "FINAL": "final",
   };
-  return map[stage] ?? stage.toLowerCase();
+  return map[stage] ?? "group";
 }
 
 function normaliseStatus(status: string): string {
@@ -99,8 +100,8 @@ interface FootballMatch {
   stage: string;
   status: string;
   utcDate: string;
-  homeTeam: { name: string; crest?: string };
-  awayTeam: { name: string; crest?: string };
+  homeTeam: { name: string; shortName?: string; crest?: string };
+  awayTeam: { name: string; shortName?: string; crest?: string };
   score: {
     fullTime: { home: number | null; away: number | null };
   };
