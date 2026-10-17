@@ -65,19 +65,25 @@ function toRow(match) {
 }
 
 async function upsertFixtures(rows) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_SERVICE_ROLE_KEY,
-      'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-      'Prefer': 'resolution=merge-duplicates',
-    },
-    body: JSON.stringify(rows),
-  });
+  // Send in batches of 50 to avoid request size limits
+  const BATCH_SIZE = 50;
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?on_conflict=external_id`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_SERVICE_ROLE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        'Prefer': 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify(batch),
+    });
 
-  if (!res.ok) {
-    throw new Error(`Supabase upsert error: ${res.status} ${await res.text()}`);
+    if (!res.ok) {
+      throw new Error(`Supabase upsert error: ${res.status} ${await res.text()}`);
+    }
+    console.log(`  Upserted rows ${i + 1}–${Math.min(i + BATCH_SIZE, rows.length)}`);
   }
 }
 
