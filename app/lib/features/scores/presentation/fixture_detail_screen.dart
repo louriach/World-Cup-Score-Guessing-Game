@@ -128,11 +128,15 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
         );
     final guessAsync = ref.watch(fixtureGuessProvider(widget.fixtureId));
 
-    // Find next upcoming fixture after this one
-    final nextFixture = allFixturesAsync.valueOrNull
-        ?.where((f) => f.isUpcoming && f.id != widget.fixtureId)
-        .toList()
-        .firstOrNull;
+    // Find previous and next upcoming fixtures relative to this one
+    final upcomingFixtures = allFixturesAsync.valueOrNull
+        ?.where((f) => f.isUpcoming)
+        .toList() ?? [];
+    final currentIndex = upcomingFixtures.indexWhere((f) => f.id == widget.fixtureId);
+    final prevFixture = currentIndex > 0 ? upcomingFixtures[currentIndex - 1] : null;
+    final nextFixture = currentIndex >= 0 && currentIndex < upcomingFixtures.length - 1
+        ? upcomingFixtures[currentIndex + 1]
+        : null;
 
     guessAsync.whenData((g) {
       if (g != null) _seedFromGuess(g);
@@ -223,32 +227,40 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
                           color: AppColors.backgroundSurface,
                           borderRadius: BorderRadius.circular(AppRadius.button),
                           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                          onPressed: () => context.pop(),
+                          onPressed: prevFixture != null
+                              ? () => _goToFixture(context, prevFixture.id)
+                              : null,
                           child: DefaultTextStyle.merge(
                             style: AppTextStyles.body.copyWith(
-                              color: AppColors.textSecondary,
+                              color: prevFixture != null
+                                  ? AppColors.textPrimary
+                                  : AppColors.textDisabled,
                             ),
-                            child: const Text('Back'),
+                            child: const Text('← Previous'),
                           ),
                         ),
                       ),
-                      if (nextFixture != null) ...[
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: CupertinoButton(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(AppRadius.button),
-                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                            onPressed: () => _goToFixture(context, nextFixture.id),
-                            child: DefaultTextStyle.merge(
-                              style: AppTextStyles.bodyLargeBold.copyWith(
-                                color: AppColors.textInverse,
-                              ),
-                              child: const Text('Next fixture →'),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: CupertinoButton(
+                          color: nextFixture != null
+                              ? AppColors.primary
+                              : AppColors.backgroundSurface,
+                          borderRadius: BorderRadius.circular(AppRadius.button),
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                          onPressed: nextFixture != null
+                              ? () => _goToFixture(context, nextFixture.id)
+                              : null,
+                          child: DefaultTextStyle.merge(
+                            style: AppTextStyles.body.copyWith(
+                              color: nextFixture != null
+                                  ? AppColors.textInverse
+                                  : AppColors.textDisabled,
                             ),
+                            child: const Text('Next →'),
                           ),
                         ),
-                      ],
+                      ),
                     ],
                   ),
                 ),
