@@ -107,16 +107,33 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
     }
   }
 
+  void _goToFixture(BuildContext context, String fixtureId) {
+    // Save current before navigating
+    _trySave();
+    context.pushReplacement('/scores/$fixtureId');
+  }
+
   @override
   Widget build(BuildContext context) {
-    final fixtureAsync = ref.watch(fixturesProvider).whenData(
+    final allFixturesAsync = ref.watch(fixturesProvider);
+    final fixtureAsync = allFixturesAsync.whenData(
           (list) => list.firstWhere((f) => f.id == widget.fixtureId),
         );
     final guessAsync = ref.watch(fixtureGuessProvider(widget.fixtureId));
 
+    // Find next upcoming fixture after this one
+    final nextFixture = allFixturesAsync.valueOrNull
+        ?.where((f) => f.isUpcoming && f.id != widget.fixtureId)
+        .toList()
+        .firstOrNull;
+
     guessAsync.whenData((g) {
       if (g != null) _seedFromGuess(g);
     });
+
+    final isGuessing = fixtureAsync.valueOrNull != null &&
+        !fixtureAsync.value!.isCompleted &&
+        !fixtureAsync.value!.isLocked;
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundBase,
@@ -154,30 +171,82 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
               style: AppTextStyles.bodySecondary),
         ),
         data: (fixture) => SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.pagePadding),
-            child: Column(
-              children: [
-                const SizedBox(height: AppSpacing.xl),
-                _MatchHeader(fixture: fixture),
-                const SizedBox(height: AppSpacing.xxxl),
-                if (fixture.isCompleted)
-                  _ResultView(fixture: fixture, guess: guessAsync.valueOrNull)
-                else if (fixture.isLocked)
-                  _LockedView(guess: guessAsync.valueOrNull)
-                else
-                  _GuessEntry(
-                    fixture: fixture,
-                    homeCtrl: _homeCtrl,
-                    awayCtrl: _awayCtrl,
-                    homeFocus: _homeFocus,
-                    awayFocus: _awayFocus,
-                    predictsPenalties: _predictsPenalties,
-                    existingGuess: guessAsync.valueOrNull,
-                    onPenaltiesChanged: _togglePenalties,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppSpacing.pagePadding),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: AppSpacing.xl),
+                      _MatchHeader(fixture: fixture),
+                      const SizedBox(height: AppSpacing.xxxl),
+                      if (fixture.isCompleted)
+                        _ResultView(fixture: fixture, guess: guessAsync.valueOrNull)
+                      else if (fixture.isLocked)
+                        _LockedView(guess: guessAsync.valueOrNull)
+                      else
+                        _GuessEntry(
+                          fixture: fixture,
+                          homeCtrl: _homeCtrl,
+                          awayCtrl: _awayCtrl,
+                          homeFocus: _homeFocus,
+                          awayFocus: _awayFocus,
+                          predictsPenalties: _predictsPenalties,
+                          existingGuess: guessAsync.valueOrNull,
+                          onPenaltiesChanged: _togglePenalties,
+                        ),
+                    ],
                   ),
-              ],
-            ),
+                ),
+              ),
+              // Bottom navigation buttons — only shown on guessing screen
+              if (isGuessing)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.pagePadding,
+                    AppSpacing.sm,
+                    AppSpacing.pagePadding,
+                    AppSpacing.pagePadding,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: CupertinoButton(
+                          color: AppColors.backgroundSurface,
+                          borderRadius: BorderRadius.circular(AppRadius.button),
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                          onPressed: () => context.pop(),
+                          child: DefaultTextStyle.merge(
+                            style: AppTextStyles.body.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                            child: const Text('Back'),
+                          ),
+                        ),
+                      ),
+                      if (nextFixture != null) ...[
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          flex: 2,
+                          child: CupertinoButton(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(AppRadius.button),
+                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                            onPressed: () => _goToFixture(context, nextFixture.id),
+                            child: DefaultTextStyle.merge(
+                              style: AppTextStyles.bodyLargeBold.copyWith(
+                                color: AppColors.textInverse,
+                              ),
+                              child: const Text('Next fixture →'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+            ],
           ),
         ),
       ),
