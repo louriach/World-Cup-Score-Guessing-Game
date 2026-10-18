@@ -68,7 +68,7 @@ class _ToastWidgetState extends State<_ToastWidget>
 
     _opacity = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _slide = Tween<Offset>(
-      begin: const Offset(0, -0.3),
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
 
@@ -104,7 +104,7 @@ class _ToastWidgetState extends State<_ToastWidget>
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + AppSpacing.base,
+      bottom: MediaQuery.of(context).padding.bottom + AppSpacing.xl,
       left: AppSpacing.pagePadding,
       right: AppSpacing.pagePadding,
       child: FadeTransition(

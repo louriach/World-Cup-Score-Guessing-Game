@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/fixture.dart';
 import '../../../shared/models/guess.dart';
-import '../../../shared/widgets/toast.dart';
 import '../providers/scores_providers.dart';
 
 class FixtureDetailScreen extends ConsumerStatefulWidget {
@@ -22,35 +21,53 @@ class FixtureDetailScreen extends ConsumerStatefulWidget {
 class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
   late final TextEditingController _homeCtrl;
   late final TextEditingController _awayCtrl;
+  late final FocusNode _homeFocus;
+  late final FocusNode _awayFocus;
   bool _predictsPenalties = false;
-  bool _showSuccess = false;
+  bool _seeded = false;
+  bool _saving = false;
+  bool _saved = false;
 
   @override
   void initState() {
     super.initState();
     _homeCtrl = TextEditingController();
     _awayCtrl = TextEditingController();
+    _homeFocus = FocusNode()..addListener(_onFocusChange);
+    _awayFocus = FocusNode()..addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
     _homeCtrl.dispose();
     _awayCtrl.dispose();
+    _homeFocus.dispose();
+    _awayFocus.dispose();
     super.dispose();
   }
 
   void _seedFromGuess(Guess guess) {
-    if (_homeCtrl.text.isEmpty && _awayCtrl.text.isEmpty) {
-      _homeCtrl.text = guess.homeScoreGuess.toString();
-      _awayCtrl.text = guess.awayScoreGuess.toString();
-      _predictsPenalties = guess.predictsPenalties;
+    if (_seeded) return;
+    _seeded = true;
+    _homeCtrl.text = guess.homeScoreGuess.toString();
+    _awayCtrl.text = guess.awayScoreGuess.toString();
+    _predictsPenalties = guess.predictsPenalties;
+  }
+
+  void _onFocusChange() {
+    // Autosave when both fields lose focus and both have values
+    if (!_homeFocus.hasFocus && !_awayFocus.hasFocus) {
+      _trySave();
     }
   }
 
-  Future<void> _submit(Fixture fixture) async {
+  Future<void> _trySave() async {
     final home = int.tryParse(_homeCtrl.text);
     final away = int.tryParse(_awayCtrl.text);
     if (home == null || away == null) return;
+    if (_saving) return;
+
+    setState(() => _saving = true);
 
     await ref.read(guessNotifierProvider(widget.fixtureId).notifier).save(
           homeScore: home,
@@ -59,19 +76,34 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
         );
 
     if (mounted) {
-      setState(() => _showSuccess = true);
+      setState(() {
+        _saving = false;
+        _saved = true;
+      });
       HapticFeedback.mediumImpact();
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) setState(() => _saved = false);
+    }
+  }
 
-      Toast.show(
-        context,
-        'Prediction saved!',
-        subtitle: 'See how your league mates guessed',
-        style: ToastStyle.success,
-        onTap: () => context.push('/scores/${widget.fixtureId}'),
-      );
+  Future<void> _togglePenalties(bool value) async {
+    setState(() => _predictsPenalties = value);
+    // Save immediately when penalties toggle changes
+    final home = int.tryParse(_homeCtrl.text);
+    final away = int.tryParse(_awayCtrl.text);
+    if (home == null || away == null) return;
 
-      await Future.delayed(AppDurations.slow);
-      if (mounted) setState(() => _showSuccess = false);
+    await ref.read(guessNotifierProvider(widget.fixtureId).notifier).save(
+          homeScore: home,
+          awayScore: away,
+          predictsPenalties: value,
+        );
+
+    if (mounted) {
+      HapticFeedback.selectionClick();
+      setState(() => _saved = true);
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) setState(() => _saved = false);
     }
   }
 
@@ -81,7 +113,6 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
           (list) => list.firstWhere((f) => f.id == widget.fixtureId),
         );
     final guessAsync = ref.watch(fixtureGuessProvider(widget.fixtureId));
-    final guessState = ref.watch(guessNotifierProvider(widget.fixtureId));
 
     guessAsync.whenData((g) {
       if (g != null) _seedFromGuess(g);
@@ -104,10 +135,20 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
           onPressed: () => context.pop(),
           child: const Icon(CupertinoIcons.back, color: AppColors.primary),
         ),
+        trailing: AnimatedSwitcher(
+          duration: AppDurations.fast,
+          child: _saving
+              ? const CupertinoActivityIndicator(key: ValueKey('loading'))
+              : _saved
+                  ? Icon(CupertinoIcons.checkmark_circle_fill,
+                      key: const ValueKey('saved'),
+                      color: AppColors.success,
+                      size: 20)
+                  : const SizedBox.shrink(key: ValueKey('idle')),
+        ),
       ),
       child: fixtureAsync.when(
-        loading: () =>
-            const Center(child: CupertinoActivityIndicator()),
+        loading: () => const Center(child: CupertinoActivityIndicator()),
         error: (_, __) => Center(
           child: Text('Failed to load match',
               style: AppTextStyles.bodySecondary),
@@ -129,13 +170,11 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
                     fixture: fixture,
                     homeCtrl: _homeCtrl,
                     awayCtrl: _awayCtrl,
+                    homeFocus: _homeFocus,
+                    awayFocus: _awayFocus,
                     predictsPenalties: _predictsPenalties,
-                    showSuccess: _showSuccess,
-                    isLoading: guessState is AsyncLoading,
                     existingGuess: guessAsync.valueOrNull,
-                    onPenaltiesChanged: (v) =>
-                        setState(() => _predictsPenalties = v),
-                    onSubmit: () => _submit(fixture),
+                    onPenaltiesChanged: _togglePenalties,
                   ),
               ],
             ),
@@ -202,30 +241,28 @@ class _MatchHeader extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Guess entry form
+// Guess entry — autosaves on defocus
 // ---------------------------------------------------------------------------
 
 class _GuessEntry extends StatelessWidget {
   final Fixture fixture;
   final TextEditingController homeCtrl;
   final TextEditingController awayCtrl;
+  final FocusNode homeFocus;
+  final FocusNode awayFocus;
   final bool predictsPenalties;
-  final bool showSuccess;
-  final bool isLoading;
   final Guess? existingGuess;
   final ValueChanged<bool> onPenaltiesChanged;
-  final VoidCallback onSubmit;
 
   const _GuessEntry({
     required this.fixture,
     required this.homeCtrl,
     required this.awayCtrl,
+    required this.homeFocus,
+    required this.awayFocus,
     required this.predictsPenalties,
-    required this.showSuccess,
-    required this.isLoading,
     required this.existingGuess,
     required this.onPenaltiesChanged,
-    required this.onSubmit,
   });
 
   @override
@@ -237,15 +274,20 @@ class _GuessEntry extends StatelessWidget {
           existingGuess != null ? 'Update your prediction' : 'Your prediction',
           style: AppTextStyles.heading3,
         ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          'Autosaves when you move between fields',
+          style: AppTextStyles.caption,
+        ),
         const SizedBox(height: AppSpacing.xl),
-        // Score inputs
         Row(
           children: [
             Expanded(
               child: _ScoreInput(
                 controller: homeCtrl,
+                focusNode: homeFocus,
+                nextFocus: awayFocus,
                 label: fixture.homeTeam,
-                showSuccess: showSuccess,
               ),
             ),
             Padding(
@@ -255,14 +297,13 @@ class _GuessEntry extends StatelessWidget {
             Expanded(
               child: _ScoreInput(
                 controller: awayCtrl,
+                focusNode: awayFocus,
                 label: fixture.awayTeam,
-                showSuccess: showSuccess,
               ),
             ),
           ],
         ),
 
-        // Penalties toggle — knockout rounds only
         if (fixture.stage.isKnockout) ...[
           const SizedBox(height: AppSpacing.xl),
           Container(
@@ -293,7 +334,7 @@ class _GuessEntry extends StatelessWidget {
                 ),
                 CupertinoSwitch(
                   value: predictsPenalties,
-                  activeColor: AppColors.primary,
+                  activeTrackColor: AppColors.primary,
                   onChanged: onPenaltiesChanged,
                 ),
               ],
@@ -301,15 +342,8 @@ class _GuessEntry extends StatelessWidget {
           ),
         ],
 
-        const SizedBox(height: AppSpacing.xxxl),
-        _SubmitButton(
-          showSuccess: showSuccess,
-          isLoading: isLoading,
-          onPressed: onSubmit,
-        ),
-
         if (existingGuess != null) ...[
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.base),
           Center(
             child: Text(
               'Last updated ${DateFormat('d MMM · HH:mm').format(existingGuess!.updatedAt.toLocal())}',
@@ -324,33 +358,33 @@ class _GuessEntry extends StatelessWidget {
 
 class _ScoreInput extends StatelessWidget {
   final TextEditingController controller;
+  final FocusNode focusNode;
+  final FocusNode? nextFocus;
   final String label;
-  final bool showSuccess;
 
   const _ScoreInput({
     required this.controller,
+    required this.focusNode,
+    this.nextFocus,
     required this.label,
-    required this.showSuccess,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AnimatedContainer(
-          duration: AppDurations.fast,
+        Container(
           decoration: BoxDecoration(
             color: AppColors.backgroundInput,
             borderRadius: BorderRadius.circular(AppRadius.input),
             border: Border.all(
-              color: showSuccess
-                  ? AppColors.scoreFieldSuccess
-                  : AppColors.scoreFieldIdle,
-              width: showSuccess ? 2 : 1.5,
+              color: AppColors.scoreFieldIdle,
+              width: 1.5,
             ),
           ),
           child: CupertinoTextField(
             controller: controller,
+            focusNode: focusNode,
             textAlign: TextAlign.center,
             style: AppTextStyles.scoreDisplay,
             keyboardType: TextInputType.number,
@@ -364,6 +398,13 @@ class _ScoreInput extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.base),
             decoration: null,
             maxLength: 2,
+            onSubmitted: (_) {
+              if (nextFocus != null) {
+                nextFocus!.requestFocus();
+              } else {
+                focusNode.unfocus();
+              }
+            },
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -377,46 +418,8 @@ class _ScoreInput extends StatelessWidget {
   }
 }
 
-class _SubmitButton extends StatelessWidget {
-  final bool showSuccess;
-  final bool isLoading;
-  final VoidCallback onPressed;
-
-  const _SubmitButton({
-    required this.showSuccess,
-    required this.isLoading,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: CupertinoButton(
-        color: showSuccess ? AppColors.success : AppColors.buttonPrimary,
-        borderRadius: BorderRadius.circular(AppRadius.button),
-        onPressed: isLoading ? null : onPressed,
-        child: AnimatedSwitcher(
-          duration: AppDurations.fast,
-          child: isLoading
-              ? const CupertinoActivityIndicator(color: AppColors.textInverse)
-              : showSuccess
-                  ? const Icon(CupertinoIcons.checkmark,
-                      key: ValueKey('check'), color: AppColors.textInverse)
-                  : DefaultTextStyle.merge(
-                      key: const ValueKey('label'),
-                      style: AppTextStyles.bodyLargeBold
-                          .copyWith(color: AppColors.buttonPrimaryLabel),
-                      child: const Text('Submit prediction'),
-                    ),
-        ),
-      ),
-    );
-  }
-}
-
 // ---------------------------------------------------------------------------
-// Locked state — shows submitted guess but no editing
+// Locked state
 // ---------------------------------------------------------------------------
 
 class _LockedView extends StatelessWidget {
@@ -457,7 +460,7 @@ class _LockedView extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Result view — shows actual score vs user's guess and points earned
+// Result view
 // ---------------------------------------------------------------------------
 
 class _ResultView extends StatelessWidget {
@@ -505,7 +508,7 @@ class _ResultView extends StatelessWidget {
                     vertical: AppSpacing.sm,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.15),
+                    color: AppColors.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppRadius.badge),
                   ),
                   child: Text(
@@ -525,7 +528,6 @@ class _ResultView extends StatelessWidget {
   }
 }
 
-// Limits score input to 0–19 (handles extra time scores gracefully)
 class _SingleDigitFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
