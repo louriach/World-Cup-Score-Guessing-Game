@@ -235,7 +235,6 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
                       if (nextFixture != null) ...[
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
-                          flex: 2,
                           child: CupertinoButton(
                             color: AppColors.primary,
                             borderRadius: BorderRadius.circular(AppRadius.button),
