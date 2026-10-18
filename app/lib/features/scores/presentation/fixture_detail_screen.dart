@@ -236,7 +236,7 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
                                   ? AppColors.textPrimary
                                   : AppColors.textDisabled,
                             ),
-                            child: const Text('Previous'),
+                            child: const Text('Previous match'),
                           ),
                         ),
                       ),
@@ -257,7 +257,7 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
                                   ? AppColors.textInverse
                                   : AppColors.textDisabled,
                             ),
-                            child: const Text('Next'),
+                            child: const Text('Next match'),
                           ),
                         ),
                       ),
