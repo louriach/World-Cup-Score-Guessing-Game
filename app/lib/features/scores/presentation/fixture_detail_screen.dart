@@ -66,6 +66,12 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
     final away = int.tryParse(_awayCtrl.text);
     if (home == null || away == null) return;
     if (_saving) return;
+    // Deduplicate: don't save if values haven't changed from existing guess
+    final existing = ref.read(fixtureGuessProvider(widget.fixtureId)).valueOrNull;
+    if (existing != null &&
+        existing.homeScoreGuess == home &&
+        existing.awayScoreGuess == away &&
+        existing.predictsPenalties == _predictsPenalties) return;
 
     setState(() => _saving = true);
 
@@ -107,10 +113,11 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
     }
   }
 
-  void _goToFixture(BuildContext context, String fixtureId) {
-    // Save current before navigating
-    _trySave();
-    context.pushReplacement('/scores/$fixtureId');
+  Future<void> _goToFixture(BuildContext context, String fixtureId) async {
+    // Dismiss keyboard and save before navigating
+    FocusScope.of(context).unfocus();
+    await _trySave();
+    if (mounted) context.pushReplacement('/scores/$fixtureId');
   }
 
   @override
