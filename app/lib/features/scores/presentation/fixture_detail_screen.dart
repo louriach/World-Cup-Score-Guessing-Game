@@ -236,7 +236,7 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
                                   ? AppColors.textPrimary
                                   : AppColors.textDisabled,
                             ),
-                            child: const Text('← Previous'),
+                            child: const Text('Previous'),
                           ),
                         ),
                       ),
@@ -257,7 +257,7 @@ class _FixtureDetailScreenState extends ConsumerState<FixtureDetailScreen> {
                                   ? AppColors.textInverse
                                   : AppColors.textDisabled,
                             ),
-                            child: const Text('Next →'),
+                            child: const Text('Next'),
                           ),
                         ),
                       ),
@@ -357,16 +357,7 @@ class _GuessEntry extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          existingGuess != null ? 'Update your prediction' : 'Your prediction',
-          style: AppTextStyles.heading3,
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'Autosaves when you move between fields',
-          style: AppTextStyles.caption,
-        ),
-        const SizedBox(height: AppSpacing.xl),
+        const SizedBox(height: AppSpacing.sm),
         Row(
           children: [
             Expanded(

@@ -220,6 +220,14 @@ class _FixtureCard extends StatelessWidget {
             // Teams + scores
             Row(
               children: [
+                if (hasGuess)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.sm),
+                    child: Icon(CupertinoIcons.checkmark_circle_fill,
+                        color: AppColors.borderSuccess, size: 16),
+                  )
+                else
+                  const SizedBox(width: 16 + AppSpacing.sm),
                 Expanded(
                   child: Text(
                     fixture.homeTeam,
@@ -235,6 +243,7 @@ class _FixtureCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                 ),
+                const SizedBox(width: 16 + AppSpacing.sm),
               ],
             ),
           ],
@@ -286,11 +295,11 @@ class _ScoreDisplay extends StatelessWidget {
         border: Border.all(color: AppColors.borderSuccess, width: 1),
       ),
       child: Text(
-        '${guess!.homeScoreGuess} – ${guess!.awayScoreGuess}',
+        '${guess!.homeScoreGuess}–${guess!.awayScoreGuess}',
         textAlign: TextAlign.center,
         maxLines: 1,
         style: AppTextStyles.scoreMedium.copyWith(
-          color: AppColors.textPrimary,
+          color: AppColors.borderSuccess,
           fontSize: 16,
         ),
       ),
